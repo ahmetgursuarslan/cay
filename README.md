@@ -63,3 +63,6 @@ MIT Lisansı (bkz. `LICENSE`).
 *** Notlar
 - Web tarafında `bun.lock` mevcut; CI da Bun kullanır. İsterseniz Node/NPM’e geçmek için scriptleri ve CI’ı uyarlayabilirsiniz.
 - Expo için EAS veya store yayın süreçleri bu depoya dâhil değildir; ihtiyaç halinde ayrı bir CI/CD pipeline eklenebilir.
+ - Patch uyarıları: `apps/mobile/patches` içindeki patch’ler, bağımlılıklar minör/patche güncellendiğinde “version mismatch” uyarısı verebilir. Patch’ler doğru uygulanıyorsa sorun yoktur. Uyarıyı kaldırmak için:
+   - İlgili paketi güncel sürüme karşı tekrar patch’leyin: `cd apps/mobile; npx patch-package <paket-adi>`
+   - Alternatif: Patch dosya adını yeni sürüme göre yeniden adlandırın (içerik aynı kalır).
