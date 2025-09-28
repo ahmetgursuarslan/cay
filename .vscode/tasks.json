@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json.schemastore.org/tasks.json",
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "web:dev",
+      "type": "shell",
+      "command": "bun",
+      "args": ["run", "dev"],
+      "options": { "cwd": "${workspaceFolder}/apps/web" },
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "mobile:start",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "start"],
+      "options": { "cwd": "${workspaceFolder}/apps/mobile" },
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "dev:all",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-Command",
+        "Start-Job { bun run dev -w apps/web } | Out-Null; Start-Job { npm run start -w apps/mobile } | Out-Null; Write-Host 'Started web and mobile in background jobs.'; Wait-Job -Any"
+      ]
+    }
+  ]
+}
