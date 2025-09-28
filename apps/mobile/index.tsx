@@ -1,10 +1,4 @@
-import ExceptionsManager from 'react-native/Libraries/Core/ExceptionsManager';
-
-if (__DEV__) {
-  ExceptionsManager.handleException = (error, isFatal) => {
-    // no-op
-  };
-}
+// Suppress noisy redbox overlay via patched metro runtime; avoid deprecated deep imports.
 
 import 'react-native-url-polyfill/auto';
 import './src/__create/polyfills';
