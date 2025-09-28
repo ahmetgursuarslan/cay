@@ -94,10 +94,11 @@ config.cacheStores = () => [
   }),
 ];
 config.resetCache = false;
+const baseReporter = config.reporter;
 config.reporter = {
-  ...config.reporter,
+  ...baseReporter,
   update: (event) => {
-    config.reporter?.update(event);
+    baseReporter?.update?.(event);
     const reportableErrors = [
       'error',
       'bundling_error',

@@ -1,17 +1,20 @@
 import { serializeError } from 'serialize-error';
 
 export const reportErrorToRemote = async ({ error }) => {
+  // Do not attempt remote reporting in development to avoid noisy logs and unnecessary network calls.
+  if (process.env.NODE_ENV !== 'production') {
+    return { success: false };
+  }
+
+  // If required public env vars are not present, no-op silently.
   if (
     !process.env.EXPO_PUBLIC_LOGS_ENDPOINT ||
     !process.env.EXPO_PUBLIC_PROJECT_GROUP_ID ||
     !process.env.EXPO_PUBLIC_CREATE_TEMP_API_KEY
   ) {
-    console.debug(
-      'reportErrorToRemote: Missing environment variables for logging endpoint, project group ID, or API key.',
-      error
-    );
     return { success: false };
   }
+
   try {
     await fetch(process.env.EXPO_PUBLIC_LOGS_ENDPOINT, {
       method: 'POST',
