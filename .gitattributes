@@ -1,0 +1,5 @@
+* text=auto eol=lf
+
+# Treat common lockfiles as text for smaller diffs
+package-lock.json linguist-generated=false
+bun.lock linguist-generated=false
