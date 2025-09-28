@@ -12,6 +12,13 @@ build/
 .expo-shared/
 android/
 ios/
+web-build/
+expo-env.d.ts
+
+# Metro
+.metro-health-check*
+.metro-cache/
+.metro-virtual/*
 
 # Env
 .env
@@ -24,6 +31,14 @@ apps/*/.env.*
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+*.tsbuildinfo
+*.orig.*
+*.apk
+*.aab
+*.ipa
+tmp/
+temp/
+caches/
 
 # OS
 .DS_Store
@@ -31,3 +46,4 @@ Thumbs.db
 
 # Vite
 vite.config.ts.timestamp-* 
+
