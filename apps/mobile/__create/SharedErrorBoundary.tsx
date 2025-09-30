@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { isErrorLike, serializeError } from 'serialize-error';
 import React, { type ReactNode, useEffect, useState, useCallback, useRef } from 'react';
 import { Animated, Text, View } from 'react-native';
@@ -99,7 +100,7 @@ export function Button({
 }: {
   color?: 'primary' | 'secondary';
   onPress?: () => void;
-  children: string;
+  children: React.ReactNode;
 }): React.ReactElement {
   return (
     <View

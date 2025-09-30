@@ -53,10 +53,7 @@
       "expo-web-browser",
       "expo-asset"
     ],
-    "web": {
-      "bundler": "metro",
-      "favicon": "./assets/images/favicon.png"
-    },
+    
     "experiments": {
       "typedRoutes": true
     },

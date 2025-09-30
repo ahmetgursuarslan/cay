@@ -1,0 +1,5 @@
+{
+  "extends": "./tsconfig.json",
+  "include": ["./src", "./.react-router/types", "./vite-env.d.ts", "./src/global.d.ts", "./src/client.d.ts"],
+  "exclude": ["node_modules", "build", "dist"]
+}

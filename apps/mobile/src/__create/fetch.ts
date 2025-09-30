@@ -1,5 +1,4 @@
 import * as SecureStore from 'expo-secure-store';
-import { fetch as expoFetch } from 'expo/fetch';
 
 const originalFetch = fetch;
 const authKey = `${process.env.EXPO_PUBLIC_PROJECT_GROUP_ID}-jwt`;
@@ -10,7 +9,15 @@ const getURLFromArgs = (...args: Parameters<typeof fetch>) => {
   if (typeof urlArg === 'string') {
     url = urlArg;
   } else if (typeof urlArg === 'object' && urlArg !== null) {
-    url = urlArg.url;
+    // avoid relying on global DOM types; use structural checks
+    const anyArg: any = urlArg as any;
+    if (typeof anyArg.url === 'string') {
+      url = anyArg.url;
+    } else if (typeof anyArg.toString === 'function') {
+      url = anyArg.toString();
+    } else {
+      url = null;
+    }
   } else {
     url = null;
   }
@@ -28,23 +35,23 @@ const isSecondPartyURL = (url: string) => {
   return url.startsWith('/_create/');
 };
 
-type Params = Parameters<typeof expoFetch>;
+type Params = Parameters<typeof fetch>;
 const fetchToWeb = async function fetchWithHeaders(...args: Params) {
   const firstPartyURL = process.env.EXPO_PUBLIC_BASE_URL;
   const secondPartyURL = process.env.EXPO_PUBLIC_PROXY_BASE_URL;
   if (!firstPartyURL || !secondPartyURL) {
-    return expoFetch(...args);
+  return fetch(...args);
   }
   const [input, init] = args;
   const url = getURLFromArgs(input, init);
   if (!url) {
-    return expoFetch(input, init);
+  return fetch(input, init);
   }
 
   const isExternalFetch = !isFirstPartyURL(url);
   // we should not add headers to requests that don't go to our own server
   if (isExternalFetch) {
-    return expoFetch(input, init);
+  return fetch(input, init);
   }
 
   let finalInput = input;
@@ -83,7 +90,7 @@ const fetchToWeb = async function fetchWithHeaders(...args: Params) {
     finalHeaders.set('authorization', `Bearer ${auth.jwt}`);
   }
 
-  return expoFetch(finalInput, {
+  return fetch(finalInput, {
     ...init,
     headers: finalHeaders,
   });

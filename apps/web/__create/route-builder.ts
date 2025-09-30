@@ -1,5 +1,5 @@
 import { readdir, stat } from 'node:fs/promises';
-import { join } from 'node:path';
+import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Hono } from 'hono';
 import type { Handler } from 'hono/types';
@@ -11,7 +11,8 @@ const api = new Hono();
 // Get current directory
 const __dirname = join(fileURLToPath(new URL('.', import.meta.url)), '../src/app/api');
 if (globalThis.fetch) {
-  globalThis.fetch = updatedFetch;
+  // Align types with the built-in fetch signature
+  globalThis.fetch = updatedFetch as unknown as typeof fetch;
 }
 
 // Recursively find all route.js files
@@ -44,7 +45,12 @@ async function findRouteFiles(dir: string): Promise<string[]> {
 
 // Helper function to transform file path to Hono route path
 function getHonoPath(routeFile: string): { name: string; pattern: string }[] {
-  const relativePath = routeFile.replace(__dirname, '');
+  // Normalize separators for cross-platform support (Windows backslashes)
+  const normRouteFile = routeFile.replace(/\\/g, '/');
+  const normBase = __dirname.replace(/\\/g, '/');
+  const relativePath = normRouteFile.startsWith(normBase)
+    ? normRouteFile.slice(normBase.length)
+    : normRouteFile;
   const parts = relativePath.split('/').filter(Boolean);
   const routeParts = parts.slice(0, -1); // Remove 'route.js'
   if (routeParts.length === 0) {
@@ -81,7 +87,11 @@ async function registerRoutes() {
 
   for (const routeFile of routeFiles) {
     try {
-      const route = await import(/* @vite-ignore */ `${routeFile}?update=${Date.now()}`);
+      // Use Vite's /@fs/ absolute file-system specifier for robust resolution on Windows
+      const absPosix = routeFile.replace(/\\/g, '/');
+      const spec = `/@fs/${absPosix}`;
+  console.debug('[route-builder] importing', `${spec}?t=${Date.now()}`);
+  const route = await import(/* @vite-ignore */ `${spec}?t=${Date.now()}`);
 
       const methods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'];
       for (const method of methods) {
@@ -91,10 +101,10 @@ async function registerRoutes() {
             const honoPath = `/${parts.map(({ pattern }) => pattern).join('/')}`;
             const handler: Handler = async (c) => {
               const params = c.req.param();
-              if (import.meta.env.DEV) {
-                const updatedRoute = await import(
-                  /* @vite-ignore */ `${routeFile}?update=${Date.now()}`
-                );
+              const isDev = (import.meta as any).env?.DEV;
+              if (isDev) {
+                console.debug('[route-builder] hot reloading', `${spec}?t=${Date.now()}`);
+                const updatedRoute = await import(/* @vite-ignore */ `${spec}?t=${Date.now()}`);
                 return await updatedRoute[method](c.req.raw, { params });
               }
               return await route[method](c.req.raw, { params });
@@ -135,12 +145,12 @@ async function registerRoutes() {
 await registerRoutes();
 
 // Hot reload routes in development
-if (import.meta.env.DEV) {
-  import.meta.glob('../src/app/api/**/route.js', {
+if ((import.meta as any).env?.DEV) {
+  (import.meta as any).glob('../src/app/api/**/route.js', {
     eager: true,
   });
-  if (import.meta.hot) {
-    import.meta.hot.accept((newSelf) => {
+  if ((import.meta as any).hot) {
+    (import.meta as any).hot.accept((newSelf: any) => {
       registerRoutes().catch((err) => {
         console.error('Error reloading routes:', err);
       });
