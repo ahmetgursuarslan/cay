@@ -1,0 +1,25 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "*.ts",
+    "*.tsx",
+    "src",
+    "__create",
+  "polyfills/native",
+  "polyfills/shared",
+    ".expo/types",
+    "expo-env.d.ts",
+    "nativewind-env.d.ts",
+    "types.d.ts",
+    "global.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "android",
+    "caches",
+    ".expo",
+    ".metro-virtual",
+    "polyfills/web/**",
+    "App.web.tsx"
+  ]
+}

@@ -1,4 +1,4 @@
-import { readdirSync, statSync } from 'node:fs';
+import { readdirSync, statSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -13,6 +13,7 @@ type Tree = {
 	path: string;
 	children: Tree[];
 	hasPage: boolean;
+	pageExt: 'jsx' | 'tsx' | null;
 	isParam: boolean;
 	paramName: string;
 	isCatchAll: boolean;
@@ -24,6 +25,7 @@ function buildRouteTree(dir: string, basePath = ''): Tree {
 		path: basePath,
 		children: [],
 		hasPage: false,
+			pageExt: null,
 		isParam: false,
 		isCatchAll: false,
 		paramName: '',
@@ -52,8 +54,9 @@ function buildRouteTree(dir: string, basePath = ''): Tree {
 			const childPath = basePath ? `${basePath}/${file}` : file;
 			const childNode = buildRouteTree(filePath, childPath);
 			node.children.push(childNode);
-		} else if (file === 'page.jsx') {
-			node.hasPage = true;
+			} else if (file === 'page.jsx' || file === 'page.tsx') {
+				node.hasPage = true;
+				node.pageExt = file.endsWith('.tsx') ? 'tsx' : 'jsx';
     }
 	}
 
@@ -64,8 +67,9 @@ function generateRoutes(node: Tree): RouteConfigEntry[] {
 	const routes: RouteConfigEntry[] = [];
 
 	if (node.hasPage) {
-		const componentPath =
-			node.path === '' ? `./${node.path}page.jsx` : `./${node.path}/page.jsx`;
+			const ext = node.pageExt ?? (existsSync(join(__dirname, node.path, 'page.tsx')) ? 'tsx' : 'jsx');
+			const componentPath =
+				node.path === '' ? `./${node.path}page.${ext}` : `./${node.path}/page.${ext}`;
 
 		if (node.path === '') {
 			routes.push(index(componentPath));
@@ -104,11 +108,13 @@ function generateRoutes(node: Tree): RouteConfigEntry[] {
 
 	return routes;
 }
+// Dev-time hooks for Vite/React Router (use static accessors to satisfy SSR module runner)
 if (import.meta.env.DEV) {
-	import.meta.glob('./**/page.jsx', {});
+	// Touch files so Vite watches them; no-op result
+	import.meta.glob('./**/page.{jsx,tsx}', {});
 	if (import.meta.hot) {
-		import.meta.hot.accept((newSelf) => {
-			import.meta.hot?.invalidate();
+		import.meta.hot.accept?.(() => {
+			import.meta.hot?.invalidate?.();
 		});
 	}
 }

@@ -9,10 +9,12 @@ const safeStringify = (value: unknown) =>
     return v;
   });
 
-const postToParent = (level: string, text: string, extra: unknown) => {
+type ConsoleLevel = 'log' | 'info' | 'warn' | 'error' | 'debug';
+const postToParent = (level: ConsoleLevel, text: string, extra: unknown) => {
   try {
     if (isBackend() || !window.parent || window.parent === window) {
-      ('level' in console ? console[level] : console.log)(text, extra);
+      const fn = (console as any)[level] ?? console.log;
+      fn.call(console, text, extra);
       return;
     }
     window.parent.postMessage(
@@ -30,16 +32,16 @@ const postToParent = (level: string, text: string, extra: unknown) => {
   }
 };
 const getURlFromArgs = (...args: Parameters<typeof originalFetch>): string => {
-  const [urlArg] = args;
-  let url: string;
-  if (typeof urlArg === 'string') {
-    url = urlArg;
-  } else if (urlArg instanceof Request) {
-    url = urlArg.url;
-  } else {
-    url = `${urlArg.protocol}//${urlArg.host}${urlArg.pathname}`;
+  const [input] = args;
+  if (typeof input === 'string') return input;
+  if (input instanceof Request) return input.url;
+  // Fallback for URL-like objects
+  const anyInput = input as any;
+  if (anyInput?.url) return String(anyInput.url);
+  if (anyInput?.protocol && anyInput?.host && anyInput?.pathname) {
+    return `${anyInput.protocol}//${anyInput.host}${anyInput.pathname}`;
   }
-  return url;
+  return String(input);
 };
 
 const isFirstPartyURL = (url: string) => {
