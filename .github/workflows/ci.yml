@@ -17,21 +17,33 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: apps/web/package-lock.json
+
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
         with:
           bun-version: '1.1.34'
 
-      - name: Install dependencies (Bun)
-        run: bun install --frozen-lockfile || bun install
+      - name: Install dependencies (npm)
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
 
-      - name: Generate React Router types
+      - name: Generate React Router types (Bun)
         run: bun x react-router typegen || npx react-router typegen
 
-      - name: Typecheck
+      - name: Typecheck (Bun)
         run: bun run typecheck || npm run typecheck --if-present
 
-      - name: Run unit tests
+      - name: Run unit tests (Bun)
         run: bun x vitest run --reporter=dot
 
   mobile:

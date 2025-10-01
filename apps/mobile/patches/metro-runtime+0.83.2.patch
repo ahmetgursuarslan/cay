@@ -6,11 +6,11 @@ index 3e2652d..d51a046 100644
      this._ws = new global.WebSocket(url);
      this._ws.onopen = () => {
        this._state = "open";
- +      this._keepaliveInterval = setInterval(() => {
- +        if (this._ws.readyState === WebSocket.OPEN) {
- +          this._ws.send(JSON.stringify({ type: '__keepalive__' }));
- +        }
- +      }, 30_000);
++      this._keepaliveInterval = setInterval(() => {
++        if (this._ws.readyState === WebSocket.OPEN) {
++          this._ws.send(JSON.stringify({ type: '__keepalive__' }));
++        }
++      }, 30_000);
        this.emit("open");
        this._flushQueue();
      };
@@ -18,7 +18,7 @@ index 3e2652d..d51a046 100644
      };
      this._ws.onclose = (closeEvent) => {
        this._state = "closed";
- +      clearInterval(this._keepaliveInterval);
++      clearInterval(this._keepaliveInterval);
        this.emit("close", closeEvent);
      };
      this._ws.onmessage = (message) => {

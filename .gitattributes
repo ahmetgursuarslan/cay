@@ -3,3 +3,6 @@
 # Treat common lockfiles as text for smaller diffs
 package-lock.json linguist-generated=false
 bun.lock linguist-generated=false
+
+# Ensure patch-package patches stay with LF endings (Linux CI parse issues)
+patches/* text eol=lf
