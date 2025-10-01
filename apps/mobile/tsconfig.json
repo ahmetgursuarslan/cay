@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
-  "moduleResolution": "bundler",
+    "moduleResolution": "bundler",
     "jsx": "react-jsx",
     "strict": true,
     "skipLibCheck": true,
@@ -11,15 +11,18 @@
     "noEmit": true,
     "resolveJsonModule": true,
     "baseUrl": ".",
-    "types": ["react", "react-native"],
+    "types": [
+      "react",
+      "react-native"
+    ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     }
   },
   "include": [
     "App.tsx",
-    // Exclude the web entry from TS by moving it to exclude below
-    // "App.web.tsx",
     "src/**/*.ts",
     "src/**/*.tsx",
     "__create/**/*.ts",
@@ -37,8 +40,8 @@
     ".metro-virtual",
     "caches",
     ".expo",
-    // Exclude web-specific files so TS doesn't typecheck them
     "App.web.tsx",
     "polyfills/web/**"
-  ]
+  ],
+  "extends": "expo/tsconfig.base"
 }
