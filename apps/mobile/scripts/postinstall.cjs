@@ -6,7 +6,6 @@ const mobileRoot = join(__dirname, '..');
 const patchesDir = join(mobileRoot, 'patches');
 const legacyPatch = join(patchesDir, '@expo+metro-runtime+5.0.4.patch');
 const badExpoRuntimePatch = join(patchesDir, '@expo+metro-runtime+6.1.2.patch');
-const badMetroPatch0832 = join(patchesDir, 'metro-runtime+0.83.2.patch');
 
 try {
   if (existsSync(legacyPatch)) {
@@ -16,10 +15,6 @@ try {
   if (existsSync(badExpoRuntimePatch)) {
     unlinkSync(badExpoRuntimePatch);
     console.log(`[postinstall] Removed invalid patch: ${badExpoRuntimePatch}`);
-  }
-  if (existsSync(badMetroPatch0832)) {
-    unlinkSync(badMetroPatch0832);
-    console.log(`[postinstall] Removed invalid patch: ${badMetroPatch0832}`);
   }
 } catch (e) {
   console.warn('[postinstall] Could not remove legacy patch:', e && e.message);
@@ -52,11 +47,6 @@ function normalizePatchEOLs(dir) {
 }
 
 normalizePatchEOLs(patchesDir);
-
-// If no patches directory or no patch files, skip
-if (!existsSync(patchesDir) || readdirSync(patchesDir).filter((f) => f.endsWith('.patch')).length === 0) {
-  process.exit(0);
-}
 
 // Remove stale patches for packages not installed in node_modules to avoid patch-package errors
 function patchFileToPackageName(fileName) {
@@ -91,15 +81,29 @@ try {
   console.warn('[postinstall] Failed to prune stale patches:', e && e.message);
 }
 
-// Try patch-package via local binary first (more reliable than npx in npm scripts on Windows)
-const localBin = join(mobileRoot, 'node_modules', '.bin', process.platform === 'win32' ? 'patch-package.cmd' : 'patch-package');
+// If no patches directory or no patch files after pruning, skip
+if (!existsSync(patchesDir) || readdirSync(patchesDir).filter((f) => f.endsWith('.patch')).length === 0) {
+  console.log('[postinstall] No patch files to apply. Skipping.');
+  process.exit(0);
+}
+
+// Try running patch-package JS entrypoint via Node for reliable behavior on Windows
 let result;
-if (existsSync(localBin)) {
-  result = spawnSync(localBin, [], { stdio: 'inherit', cwd: mobileRoot });
+const beforeRun = readdirSync(patchesDir).filter((f) => f.endsWith('.patch'));
+console.log(`[postinstall] Applying patches: ${beforeRun.join(', ')}`);
+let entry = null;
+try {
+  entry = require.resolve('patch-package/dist/index.js', { paths: [mobileRoot] });
+} catch (_) {}
+if (entry) {
+  console.log(`[postinstall] Running node ${entry}`);
+  result = spawnSync(process.execPath, [entry], { stdio: 'inherit', cwd: mobileRoot });
 } else {
   const cmd = process.platform === 'win32' ? 'npx.cmd' : 'npx';
+  console.log('[postinstall] Running via npx patch-package');
   result = spawnSync(cmd, ['patch-package'], { stdio: 'inherit', cwd: mobileRoot });
 }
+console.log(`[postinstall] patch-package exited with code: ${result && typeof result.status !== 'undefined' ? result.status : 'unknown'}`);
 
 if (result.status === 0) {
   process.exit(0);
