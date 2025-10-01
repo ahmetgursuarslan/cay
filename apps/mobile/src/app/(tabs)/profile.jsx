@@ -419,6 +419,15 @@ export default function ProfileScreen() {
           </Text>
 
           <SettingsOption
+            icon={Settings}
+            title="Ayarlar"
+            description="Uygulama ayarlarını yönet"
+            onPress={() => router.push("/settings")}
+            iconColor={colors.accent}
+            iconBackground={colors.accentLight}
+          />
+
+          <SettingsOption
             icon={User}
             title="Kişisel Bilgiler"
             description="Ad, soyad ve profil bilgileri"
