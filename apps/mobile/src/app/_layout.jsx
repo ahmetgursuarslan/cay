@@ -1,11 +1,12 @@
 
 import { useAuth } from '@/utils/auth/useAuth';
 import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+import * as SplashScreen from 'expo-splash-screen';
+import { View, ActivityIndicator } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-SplashScreen.preventAutoHideAsync();
+import { useFonts, Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -20,24 +21,30 @@ const queryClient = new QueryClient({
 
 export default function RootLayout() {
   const { initiate, isReady } = useAuth();
+  const [fontsLoaded] = useFonts({
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+  });
 
   useEffect(() => {
     initiate();
   }, [initiate]);
 
+  // Ensure splash screen is hidden as early as possible
   useEffect(() => {
-    if (isReady) {
-      SplashScreen.hideAsync();
-    }
-  }, [isReady]);
-
-  if (!isReady) {
-    return null;
-  }
+    SplashScreen.hideAsync().catch(() => {});
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
       <GestureHandlerRootView style={{ flex: 1 }}>
+        {!fontsLoaded ? (
+          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+            <ActivityIndicator size="small" color="#16A34A" />
+          </View>
+        ) : (
         <Stack screenOptions={{ headerShown: false }} initialRouteName="index">
           <Stack.Screen name="index" />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
@@ -51,6 +58,7 @@ export default function RootLayout() {
           <Stack.Screen name="contact" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />
         </Stack>
+        )}
       </GestureHandlerRootView>
     </QueryClientProvider>
   );
