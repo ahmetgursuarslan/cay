@@ -58,6 +58,39 @@ if (!existsSync(patchesDir) || readdirSync(patchesDir).filter((f) => f.endsWith(
   process.exit(0);
 }
 
+// Remove stale patches for packages not installed in node_modules to avoid patch-package errors
+function patchFileToPackageName(fileName) {
+  // Remove trailing .patch
+  const base = fileName.replace(/\.patch$/, '');
+  // Strip version suffix: everything after the last '+' is usually the version
+  const lastPlus = base.lastIndexOf('+');
+  const pkgSegment = lastPlus > 0 ? base.substring(0, lastPlus) : base;
+  // Handle scoped packages encoded as '@scope+name'
+  if (pkgSegment.startsWith('@')) {
+    const parts = pkgSegment.split('+');
+    if (parts.length >= 2) {
+      return `${parts[0]}/${parts[1]}`; // @scope/name
+    }
+  }
+  // Unscoped packages use '-' and are not transformed
+  return pkgSegment;
+}
+
+try {
+  const patchFiles = readdirSync(patchesDir).filter((f) => f.endsWith('.patch'));
+  for (const pf of patchFiles) {
+    const pkg = patchFileToPackageName(pf);
+    const pkgPath = join(mobileRoot, 'node_modules', pkg);
+    if (!existsSync(pkgPath)) {
+      const abs = join(patchesDir, pf);
+      unlinkSync(abs);
+      console.log(`[postinstall] Removed stale patch (pkg not installed): ${abs}`);
+    }
+  }
+} catch (e) {
+  console.warn('[postinstall] Failed to prune stale patches:', e && e.message);
+}
+
 // Try patch-package first
 const cmd = process.platform === 'win32' ? 'npx.cmd' : 'npx';
 let result = spawnSync(cmd, ['patch-package'], { stdio: 'inherit', cwd: mobileRoot });
