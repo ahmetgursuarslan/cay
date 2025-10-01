@@ -5,11 +5,16 @@ const { spawnSync } = require('child_process');
 const mobileRoot = join(__dirname, '..');
 const patchesDir = join(mobileRoot, 'patches');
 const legacyPatch = join(patchesDir, '@expo+metro-runtime+5.0.4.patch');
+const badExpoRuntimePatch = join(patchesDir, '@expo+metro-runtime+6.1.2.patch');
 
 try {
   if (existsSync(legacyPatch)) {
     unlinkSync(legacyPatch);
     console.log(`[postinstall] Removed legacy patch: ${legacyPatch}`);
+  }
+  if (existsSync(badExpoRuntimePatch)) {
+    unlinkSync(badExpoRuntimePatch);
+    console.log(`[postinstall] Removed invalid patch: ${badExpoRuntimePatch}`);
   }
 } catch (e) {
   console.warn('[postinstall] Could not remove legacy patch:', e && e.message);
