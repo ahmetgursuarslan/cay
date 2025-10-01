@@ -31,10 +31,17 @@ jobs:
 
       - name: Install dependencies (npm)
         run: |
-          if [ -f package-lock.json ]; then
-            npm ci
+          rm -rf node_modules package-lock.json || true
+          npm install --include=optional
+
+      - name: Ensure rollup native binary
+        run: |
+          if node -e "require('@rollup/rollup-linux-x64-gnu')" 2>/dev/null; then
+            echo "@rollup/rollup-linux-x64-gnu already present";
           else
-            npm install
+            v=$(node -p "require('rollup/package.json').version");
+            echo "Installing @rollup/rollup-linux-x64-gnu@${v}";
+            npm i -D @rollup/rollup-linux-x64-gnu@"${v}";
           fi
 
       - name: Generate React Router types (Bun)
