@@ -91,9 +91,15 @@ try {
   console.warn('[postinstall] Failed to prune stale patches:', e && e.message);
 }
 
-// Try patch-package first
-const cmd = process.platform === 'win32' ? 'npx.cmd' : 'npx';
-let result = spawnSync(cmd, ['patch-package'], { stdio: 'inherit', cwd: mobileRoot });
+// Try patch-package via local binary first (more reliable than npx in npm scripts on Windows)
+const localBin = join(mobileRoot, 'node_modules', '.bin', process.platform === 'win32' ? 'patch-package.cmd' : 'patch-package');
+let result;
+if (existsSync(localBin)) {
+  result = spawnSync(localBin, [], { stdio: 'inherit', cwd: mobileRoot });
+} else {
+  const cmd = process.platform === 'win32' ? 'npx.cmd' : 'npx';
+  result = spawnSync(cmd, ['patch-package'], { stdio: 'inherit', cwd: mobileRoot });
+}
 
 if (result.status === 0) {
   process.exit(0);
