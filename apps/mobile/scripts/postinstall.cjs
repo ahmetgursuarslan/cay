@@ -6,6 +6,7 @@ const mobileRoot = join(__dirname, '..');
 const patchesDir = join(mobileRoot, 'patches');
 const legacyPatch = join(patchesDir, '@expo+metro-runtime+5.0.4.patch');
 const badExpoRuntimePatch = join(patchesDir, '@expo+metro-runtime+6.1.2.patch');
+const badMetroPatch0832 = join(patchesDir, 'metro-runtime+0.83.2.patch');
 
 try {
   if (existsSync(legacyPatch)) {
@@ -15,6 +16,10 @@ try {
   if (existsSync(badExpoRuntimePatch)) {
     unlinkSync(badExpoRuntimePatch);
     console.log(`[postinstall] Removed invalid patch: ${badExpoRuntimePatch}`);
+  }
+  if (existsSync(badMetroPatch0832)) {
+    unlinkSync(badMetroPatch0832);
+    console.log(`[postinstall] Removed invalid patch: ${badMetroPatch0832}`);
   }
 } catch (e) {
   console.warn('[postinstall] Could not remove legacy patch:', e && e.message);
