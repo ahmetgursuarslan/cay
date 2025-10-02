@@ -17,12 +17,17 @@ export const useAuth = () => {
   const { isOpen, close, open } = useAuthModal();
 
   const initiate = useCallback(() => {
-    SecureStore.getItemAsync(authKey).then((auth) => {
-      useAuthStore.setState({
-        auth: auth ? JSON.parse(auth) : null,
-        isReady: true,
+    SecureStore.getItemAsync(authKey)
+      .then((auth) => {
+        useAuthStore.setState({
+          auth: auth ? JSON.parse(auth) : null,
+          isReady: true,
+        });
+      })
+      .catch(() => {
+        // If SecureStore fails (e.g., device lock or permission), don't block the app
+        useAuthStore.setState({ auth: null, isReady: true });
       });
-    });
   }, []);
 
   useEffect(() => {}, []);

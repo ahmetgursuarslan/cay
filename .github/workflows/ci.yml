@@ -70,16 +70,13 @@ jobs:
           cache: 'npm'
           cache-dependency-path: apps/mobile/package-lock.json
 
-      - name: Install dependencies
+      - name: Clean and install dependencies
         run: |
-          if [ -f package-lock.json ]; then
-            npm ci
-          else
-            npm install
-          fi
+          rm -rf node_modules package-lock.json || true
+          npm install --legacy-peer-deps
 
       - name: Typecheck
-        run: npx tsc -p tsconfig.json --noEmit
+        run: npm run typecheck
 
       - name: Verify patch-package patches
         run: npx patch-package --check

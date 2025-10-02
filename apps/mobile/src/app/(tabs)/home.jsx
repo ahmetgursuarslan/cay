@@ -20,13 +20,7 @@ import {
   Coffee,
 } from "lucide-react-native";
 import { useRouter } from "expo-router";
-import {
-  useFonts,
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_700Bold,
-} from "@expo-google-fonts/inter";
+// Fonts are loaded at the root layout; avoid per-screen gating
 
 const { width: screenWidth } = Dimensions.get("window");
 
@@ -37,16 +31,7 @@ export default function Home() {
   const isDark = colorScheme === "dark";
   const [showHeaderBorder, setShowHeaderBorder] = useState(false);
 
-  const [fontsLoaded] = useFonts({
-    Inter_400Regular,
-    Inter_500Medium,
-    Inter_600SemiBold,
-    Inter_700Bold,
-  });
-
-  if (!fontsLoaded) {
-    return null;
-  }
+  // Do not block render on fonts here; root layout handles fonts
 
   // Color palette with green theme
   const colors = {

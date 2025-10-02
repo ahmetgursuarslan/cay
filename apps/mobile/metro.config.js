@@ -59,6 +59,7 @@ config.cacheStores = () => [
     root: path.join(cacheDir, '.metro-cache'),
   }),
 ];
+// Avoid forcing a cache reset on every start; use `--reset-cache` only when needed.
 config.resetCache = false;
 const baseReporter = config.reporter;
 config.reporter = {
