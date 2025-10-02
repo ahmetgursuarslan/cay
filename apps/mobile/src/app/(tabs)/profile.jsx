@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -32,13 +32,17 @@ import {
   Inter_600SemiBold,
   Inter_700Bold,
 } from "@expo-google-fonts/inter";
+import { useSettingsStore } from "@/utils/settings/store";
+import { getIsDark, makeColors } from "@/utils/theme";
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
   const [showHeaderBorder, setShowHeaderBorder] = useState(false);
+  const { init, isReady: settingsReady, profile, appearance } = useSettingsStore();
+  useEffect(() => { init(); }, [init]);
+  const isDark = getIsDark(colorScheme === 'dark', appearance?.theme);
 
   const [fontsLoaded] = useFonts({
     Inter_400Regular,
@@ -51,26 +55,14 @@ export default function ProfileScreen() {
     return null;
   }
 
-  const colors = {
-    primary: isDark ? "#FFFFFF" : "#000000",
-    secondary: isDark ? "#CCCCCC" : "#6B7280",
-    accent: "#16A34A",
-    accentLight: "#DCFCE7",
-    white: isDark ? "#121212" : "#FFFFFF",
-    background: isDark ? "#1F1F1F" : "#F9FAFB",
-    card: isDark ? "#2A2A2A" : "#FFFFFF",
-    border: isDark ? "#374151" : "#E5E7EB",
-    danger: "#EF4444",
-    warning: "#F59E0B",
-    blue: "#3B82F6",
-    purple: "#8B5CF6",
-  };
+  const colors = makeColors(isDark);
 
   const handleScroll = (event) => {
     const scrollY = event.nativeEvent.contentOffset.y;
     setShowHeaderBorder(scrollY > 0);
   };
 
+  const fullName = (profile?.firstName || profile?.lastName) ? `${profile?.firstName || ''} ${profile?.lastName || ''}`.trim() : null;
   const ProfileHeader = () => (
     <View style={{ paddingHorizontal: 24, paddingTop: 24, marginBottom: 32 }}>
       <View
@@ -103,7 +95,7 @@ export default function ProfileScreen() {
             marginBottom: 8,
           }}
         >
-          Hoş Geldin!
+          {fullName || 'Hoş Geldin!'}
         </Text>
         <Text
           style={{
@@ -355,6 +347,7 @@ export default function ProfileScreen() {
               justifyContent: "center",
             }}
             activeOpacity={0.8}
+            onPress={() => router.push('/settings')}
           >
             <Settings size={24} color={colors.accent} />
           </TouchableOpacity>
@@ -415,7 +408,7 @@ export default function ProfileScreen() {
               marginBottom: 16,
             }}
           >
-            Hesap Ayarları
+            Hesap Ayarları 
           </Text>
 
           <SettingsOption
@@ -531,10 +524,7 @@ export default function ProfileScreen() {
             icon={LogOut}
             title="Çıkış Yap"
             description="Hesabınızdan güvenli şekilde çıkış yapın"
-            onPress={() => {
-              // Handle logout
-              console.log("Logout pressed");
-            }}
+            onPress={() => router.push("/logout")}
             iconColor={colors.danger}
             iconBackground={`${colors.danger}20`}
           />

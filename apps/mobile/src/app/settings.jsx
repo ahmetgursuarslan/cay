@@ -35,12 +35,17 @@ import {
   Inter_600SemiBold,
   Inter_700Bold,
 } from "@expo-google-fonts/inter";
+import { useEffect } from 'react';
+import { useSettingsStore } from '@/utils/settings/store';
+import { getIsDark } from '@/utils/theme';
 
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const { init, isReady, appearance, language } = useSettingsStore();
+  useEffect(() => { init(); }, [init]);
+  const isDark = getIsDark(colorScheme === 'dark', appearance?.theme);
 
   const [pushNotifications, setPushNotifications] = useState(true);
   const [emailNotifications, setEmailNotifications] = useState(false);
@@ -330,16 +335,16 @@ export default function SettingsScreen() {
           <SettingsItem
             icon={isDark ? Moon : Sun}
             title="Tema"
-            description={`Şu an: ${isDark ? "Koyu" : "Açık"} tema`}
-            onPress={() => {}}
+            description={`Şu an: ${appearance?.theme === 'dark' ? 'Koyu' : appearance?.theme === 'light' ? 'Açık' : 'Sistem'} tema`}
+            onPress={() => router.push('/theme-settings')}
             iconColor={colors.warning}
             iconBackground={`${colors.warning}20`}
           />
           <SettingsItem
             icon={Globe}
             title="Dil"
-            description="Türkçe"
-            onPress={() => {}}
+            description={language === 'en' ? 'English' : 'Türkçe'}
+            onPress={() => router.push('/language-settings')}
             iconColor={colors.accent}
             iconBackground={colors.accentLight}
           />
@@ -418,6 +423,7 @@ export default function SettingsScreen() {
               borderColor: colors.danger,
             }}
             activeOpacity={0.8}
+            onPress={() => router.push('/logout')}
           >
             <LogOut size={20} color={colors.danger} style={{ marginRight: 8 }} />
             <Text

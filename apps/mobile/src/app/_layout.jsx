@@ -4,6 +4,7 @@ import { Stack } from 'expo-router';
 import { useEffect } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
 import { View, ActivityIndicator } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useFonts, Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
@@ -39,12 +40,8 @@ export default function RootLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <SafeAreaProvider>
       <GestureHandlerRootView style={{ flex: 1 }}>
-        {!fontsLoaded ? (
-          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            <ActivityIndicator size="small" color="#16A34A" />
-          </View>
-        ) : (
         <Stack screenOptions={{ headerShown: false }} initialRouteName="index">
           <Stack.Screen name="index" />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
@@ -53,13 +50,28 @@ export default function RootLayout() {
           <Stack.Screen name="add-review" options={{ headerShown: false }} />
           <Stack.Screen name="report" options={{ headerShown: false }} />
           <Stack.Screen name="settings" options={{ headerShown: false }} />
+          <Stack.Screen name="privacy-settings" options={{ headerShown: false }} />
+          <Stack.Screen name="security-settings" options={{ headerShown: false }} />
+          <Stack.Screen name="terms" options={{ headerShown: false }} />
+          <Stack.Screen name="privacy-policy" options={{ headerShown: false }} />
+          <Stack.Screen name="login" options={{ headerShown: false }} />
+          <Stack.Screen name="signup" options={{ headerShown: false }} />
+          <Stack.Screen name="logout" options={{ headerShown: false }} />
+          <Stack.Screen name="verify-profile" options={{ headerShown: false }} />
+          <Stack.Screen name="photo-check" options={{ headerShown: false }} />
+          <Stack.Screen name="criminal-check" options={{ headerShown: false }} />
+          <Stack.Screen name="edit-profile" options={{ headerShown: false }} />
+          <Stack.Screen name="contact-settings" options={{ headerShown: false }} />
+          <Stack.Screen name="notification-settings" options={{ headerShown: false }} />
+          <Stack.Screen name="theme-settings" options={{ headerShown: false }} />
+          <Stack.Screen name="language-settings" options={{ headerShown: false }} />
           <Stack.Screen name="help" options={{ headerShown: false }} />
           <Stack.Screen name="about" options={{ headerShown: false }} />
           <Stack.Screen name="contact" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />
         </Stack>
-        )}
       </GestureHandlerRootView>
+      </SafeAreaProvider>
     </QueryClientProvider>
   );
 }
