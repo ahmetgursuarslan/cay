@@ -4,10 +4,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ArrowLeft, FileText } from 'lucide-react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useRouter } from 'expo-router';
+import { useSafeBack } from '@/utils/navigation';
 
 export default function TermsScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const safeBack = useSafeBack();
   const isDark = useColorScheme() === 'dark';
 
   const colors = {
@@ -23,7 +25,7 @@ export default function TermsScreen() {
       <StatusBar style={isDark ? 'light' : 'dark'} />
       <View style={{ backgroundColor: colors.card, paddingTop: insets.top + 16, paddingBottom: 16, paddingHorizontal: 24, borderBottomWidth: 1, borderBottomColor: colors.border }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <TouchableOpacity onPress={() => router.back()} style={{ width: 40, height: 40, backgroundColor: colors.background, borderRadius: 20, alignItems: 'center', justifyContent: 'center' }}>
+          <TouchableOpacity onPress={safeBack} style={{ width: 40, height: 40, backgroundColor: colors.background, borderRadius: 20, alignItems: 'center', justifyContent: 'center' }}>
             <ArrowLeft size={20} color={colors.primary} />
           </TouchableOpacity>
           <Text style={{ fontSize: 18, color: colors.primary }}>Kullanım Koşulları</Text>

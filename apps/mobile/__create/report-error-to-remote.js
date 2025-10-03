@@ -1,6 +1,6 @@
-import { serializeError } from 'serialize-error';
+const { serializeError } = require('serialize-error');
 
-export const reportErrorToRemote = async ({ error }) => {
+const reportErrorToRemote = async ({ error }) => {
   // Do not attempt remote reporting in development to avoid noisy logs and unnecessary network calls.
   if (process.env.NODE_ENV !== 'production') {
     return { success: false };
@@ -38,3 +38,5 @@ export const reportErrorToRemote = async ({ error }) => {
   }
   return { success: true };
 };
+
+module.exports = { reportErrorToRemote };

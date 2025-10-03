@@ -10,7 +10,6 @@
     "allowSyntheticDefaultImports": true,
     "noEmit": true,
     "resolveJsonModule": true,
-    "baseUrl": ".",
     "types": [
       "react",
       "react-native"

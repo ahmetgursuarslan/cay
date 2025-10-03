@@ -2,11 +2,13 @@ import { Tabs } from "expo-router";
 import { Home, Search, MessageSquare, Shield, User } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColorScheme } from "react-native";
+import React from "react";
 
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
+  // Public tabs; auth guard intentionally disabled
 
   return (
     <Tabs

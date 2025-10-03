@@ -21,18 +21,13 @@ import {
   X,
 } from "lucide-react-native";
 import { useRouter } from "expo-router";
-import {
-  useFonts,
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_700Bold,
-} from "@expo-google-fonts/inter";
-import KeyboardAvoidingAnimatedView from "@/components/KeyboardAvoidingAnimatedView";
+import { useSafeBack } from '@/utils/navigation';
+// Fonts loaded globally; avoid per-screen gating
 
 export default function AddReviewScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const safeBack = useSafeBack();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
 
@@ -45,16 +40,7 @@ export default function AddReviewScreen() {
   const [safetyLevel, setSafetyLevel] = useState("");
   const [isAnonymous, setIsAnonymous] = useState(false);
 
-  const [fontsLoaded] = useFonts({
-    Inter_400Regular,
-    Inter_500Medium,
-    Inter_600SemiBold,
-    Inter_700Bold,
-  });
-
-  if (!fontsLoaded) {
-    return null;
-  }
+  // Do not block render on fonts; rely on global loading/fallback
 
   const colors = {
     primary: isDark ? "#FFFFFF" : "#000000",
@@ -96,8 +82,8 @@ export default function AddReviewScreen() {
 
   const handleSubmit = () => {
     if (isFormValid()) {
-      // API call here
-      router.back();
+  // API call here
+  safeBack();
     }
   };
 
@@ -202,7 +188,6 @@ export default function AddReviewScreen() {
   );
 
   return (
-    <KeyboardAvoidingAnimatedView style={{ flex: 1 }} behavior="padding">
       <View style={{ flex: 1, backgroundColor: colors.background }}>
         <StatusBar style={isDark ? "light" : "dark"} />
 
@@ -230,7 +215,7 @@ export default function AddReviewScreen() {
             }}
           >
             <TouchableOpacity
-              onPress={() => router.back()}
+              onPress={safeBack}
               style={{
                 width: 40,
                 height: 40,
@@ -259,6 +244,7 @@ export default function AddReviewScreen() {
         <ScrollView
           style={{ flex: 1 }}
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
           contentContainerStyle={{ padding: 24, paddingBottom: 100 }}
         >
           {/* Info Banner */}
@@ -581,6 +567,5 @@ export default function AddReviewScreen() {
           </TouchableOpacity>
         </View>
       </View>
-    </KeyboardAvoidingAnimatedView>
   );
 }

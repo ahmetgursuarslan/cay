@@ -23,13 +23,7 @@ import {
   AlertOctagon,
 } from "lucide-react-native";
 import { useRouter } from "expo-router";
-import {
-  useFonts,
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_700Bold,
-} from "@expo-google-fonts/inter";
+// Fonts are loaded globally; avoid per-screen gating
 
 export default function SafetyScreen() {
   const insets = useSafeAreaInsets();
@@ -38,16 +32,7 @@ export default function SafetyScreen() {
   const isDark = colorScheme === "dark";
   const [showHeaderBorder, setShowHeaderBorder] = useState(false);
 
-  const [fontsLoaded] = useFonts({
-    Inter_400Regular,
-    Inter_500Medium,
-    Inter_600SemiBold,
-    Inter_700Bold,
-  });
-
-  if (!fontsLoaded) {
-    return null;
-  }
+  // Do not block render on fonts
 
   const colors = {
     primary: isDark ? "#FFFFFF" : "#000000",

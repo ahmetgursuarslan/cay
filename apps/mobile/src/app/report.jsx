@@ -21,18 +21,13 @@ import {
   FileText,
 } from "lucide-react-native";
 import { useRouter } from "expo-router";
-import {
-  useFonts,
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_700Bold,
-} from "@expo-google-fonts/inter";
-import KeyboardAvoidingAnimatedView from "@/components/KeyboardAvoidingAnimatedView";
+import { useSafeBack } from '@/utils/navigation';
+// Fonts loaded globally; avoid per-screen gating
 
 export default function ReportScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const safeBack = useSafeBack();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
 
@@ -43,16 +38,7 @@ export default function ReportScreen() {
   const [contactInfo, setContactInfo] = useState("");
   const [isAnonymous, setIsAnonymous] = useState(false);
 
-  const [fontsLoaded] = useFonts({
-    Inter_400Regular,
-    Inter_500Medium,
-    Inter_600SemiBold,
-    Inter_700Bold,
-  });
-
-  if (!fontsLoaded) {
-    return null;
-  }
+  // Do not block render on fonts; rely on global loading/fallback
 
   const colors = {
     primary: isDark ? "#FFFFFF" : "#000000",
@@ -94,8 +80,8 @@ export default function ReportScreen() {
 
   const handleSubmit = () => {
     if (isFormValid()) {
-      // API call here
-      router.back();
+  // API call here
+  safeBack();
     }
   };
 
@@ -127,7 +113,6 @@ export default function ReportScreen() {
   );
 
   return (
-    <KeyboardAvoidingAnimatedView style={{ flex: 1 }} behavior="padding">
       <View style={{ flex: 1, backgroundColor: colors.background }}>
         <StatusBar style={isDark ? "light" : "dark"} />
 
@@ -155,7 +140,7 @@ export default function ReportScreen() {
             }}
           >
             <TouchableOpacity
-              onPress={() => router.back()}
+              onPress={safeBack}
               style={{
                 width: 40,
                 height: 40,
@@ -184,6 +169,7 @@ export default function ReportScreen() {
         <ScrollView
           style={{ flex: 1 }}
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
           contentContainerStyle={{ padding: 24, paddingBottom: 100 }}
         >
           {/* Warning Banner */}
@@ -651,6 +637,5 @@ export default function ReportScreen() {
           </TouchableOpacity>
         </View>
       </View>
-    </KeyboardAvoidingAnimatedView>
   );
 }

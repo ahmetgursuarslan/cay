@@ -37,7 +37,7 @@ export default function SignupScreen() {
       <TouchableOpacity onPress={onSignup} style={{ backgroundColor: colors.accent, padding: 14, borderRadius: 12, alignItems: 'center' }}>
         <Text style={{ color: 'white', fontSize: 16 }}>Kayıt Ol</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => router.push('/login')} style={{ padding: 14, alignItems: 'center', marginTop: 8 }}>
+  <TouchableOpacity onPress={() => router.push('/(auth)/login')} style={{ padding: 14, alignItems: 'center', marginTop: 8 }}>
         <Text style={{ color: colors.secondary, fontSize: 14 }}>Zaten hesabın var mı? Giriş Yap</Text>
       </TouchableOpacity>
     </View>

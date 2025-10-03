@@ -22,5 +22,14 @@ module.exports = function (api) {
       // Keep Reanimated plugin LAST
       'react-native-reanimated/plugin',
     ],
+    env: {
+      production: {
+        // Remove console.* calls in production to reduce JS thread overhead
+        plugins: [[
+          'transform-remove-console',
+          { exclude: ['error', 'warn'] }
+        ]],
+      },
+    },
   };
 };

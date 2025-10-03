@@ -21,14 +21,7 @@ import {
   X,
 } from "lucide-react-native";
 import { useRouter } from "expo-router";
-import {
-  useFonts,
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_700Bold,
-} from "@expo-google-fonts/inter";
-import KeyboardAvoidingAnimatedView from "@/components/KeyboardAvoidingAnimatedView";
+// Avoid custom keyboard wrapper to prevent any overlay/touch issues
 
 export default function SearchScreen() {
   const insets = useSafeAreaInsets();
@@ -39,16 +32,7 @@ export default function SearchScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeSearchType, setActiveSearchType] = useState("name");
 
-  const [fontsLoaded] = useFonts({
-    Inter_400Regular,
-    Inter_500Medium,
-    Inter_600SemiBold,
-    Inter_700Bold,
-  });
-
-  if (!fontsLoaded) {
-    return null;
-  }
+  // Do not block on font loading; use system font fallback on first paint
 
   const colors = {
     primary: isDark ? "#FFFFFF" : "#000000",
@@ -178,8 +162,7 @@ export default function SearchScreen() {
   ];
 
   return (
-    <KeyboardAvoidingAnimatedView style={{ flex: 1 }} behavior="padding">
-      <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
         <StatusBar style={isDark ? "light" : "dark"} />
 
         {/* Fixed Header */}
@@ -223,6 +206,7 @@ export default function SearchScreen() {
         <ScrollView
           style={{ flex: 1 }}
           contentContainerStyle={{ paddingBottom: insets.bottom + 100 }}
+          keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
           onScroll={handleScroll}
           scrollEventThrottle={16}
@@ -449,6 +433,5 @@ export default function SearchScreen() {
           </View>
         </ScrollView>
       </View>
-    </KeyboardAvoidingAnimatedView>
   );
 }

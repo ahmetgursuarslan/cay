@@ -4,12 +4,14 @@ import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ArrowLeft, Save } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
+import { useSafeBack } from '@/utils/navigation';
 import { useSettingsStore } from '@/utils/settings/store';
 import { getIsDark, makeColors } from '@/utils/theme';
 
 export default function ContactSettings() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const safeBack = useSafeBack();
   const systemDark = useColorScheme() === 'dark';
   const { init, isReady, contact, save, appearance } = useSettingsStore();
   const isDark = getIsDark(systemDark, appearance?.theme);
@@ -18,13 +20,13 @@ export default function ContactSettings() {
   const [phone, setPhone] = useState('');
   useEffect(() => { init(); }, [init]);
   useEffect(() => { if (isReady) { setEmail(contact?.email || ''); setPhone(contact?.phone || ''); } }, [isReady, contact]);
-  const onSave = async () => { await save({ contact: { email, phone } }); router.back(); };
+  const onSave = async () => { await save({ contact: { email, phone } }); safeBack(); };
   return (
     <View style={{ flex:1, backgroundColor: colors.background }}>
       <StatusBar style={isDark ? 'light' : 'dark'} />
       <View style={{ paddingTop: insets.top + 16, paddingBottom: 16, paddingHorizontal: 16, backgroundColor: colors.surface, borderBottomWidth:1, borderBottomColor: colors.border }}>
         <View style={{ flexDirection:'row', alignItems:'center', justifyContent:'space-between' }}>
-          <TouchableOpacity onPress={() => router.back()} style={{ width:40, height:40, borderRadius:20, alignItems:'center', justifyContent:'center', backgroundColor: colors.background }}>
+          <TouchableOpacity onPress={safeBack} style={{ width:40, height:40, borderRadius:20, alignItems:'center', justifyContent:'center', backgroundColor: colors.background }}>
             <ArrowLeft size={20} color={colors.primary} />
           </TouchableOpacity>
           <Text style={{ color: colors.primary, fontSize: 18, fontWeight:'600' }}>İletişim Ayarları</Text>

@@ -28,13 +28,7 @@ import {
   Lock,
 } from "lucide-react-native";
 import { useRouter } from "expo-router";
-import {
-  useFonts,
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_700Bold,
-} from "@expo-google-fonts/inter";
+import { useSafeBack } from '@/utils/navigation';
 import { useEffect } from 'react';
 import { useSettingsStore } from '@/utils/settings/store';
 import { getIsDark } from '@/utils/theme';
@@ -42,6 +36,7 @@ import { getIsDark } from '@/utils/theme';
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const safeBack = useSafeBack();
   const colorScheme = useColorScheme();
   const { init, isReady, appearance, language } = useSettingsStore();
   useEffect(() => { init(); }, [init]);
@@ -52,16 +47,7 @@ export default function SettingsScreen() {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [vibrationEnabled, setVibrationEnabled] = useState(true);
 
-  const [fontsLoaded] = useFonts({
-    Inter_400Regular,
-    Inter_500Medium,
-    Inter_600SemiBold,
-    Inter_700Bold,
-  });
-
-  if (!fontsLoaded) {
-    return null;
-  }
+  // Do not block render on fonts; rely on global loading/fallback
 
   const colors = {
     primary: isDark ? "#FFFFFF" : "#000000",
@@ -259,7 +245,7 @@ export default function SettingsScreen() {
           }}
         >
           <TouchableOpacity
-            onPress={() => router.back()}
+            onPress={safeBack}
             style={{
               width: 40,
               height: 40,

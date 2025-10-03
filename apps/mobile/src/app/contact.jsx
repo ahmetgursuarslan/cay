@@ -24,18 +24,14 @@ import {
   Facebook,
 } from "lucide-react-native";
 import { useRouter } from "expo-router";
-import {
-  useFonts,
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_700Bold,
-} from "@expo-google-fonts/inter";
-import KeyboardAvoidingAnimatedView from "@/components/KeyboardAvoidingAnimatedView";
+import { useSafeBack } from '@/utils/navigation';
+// Fonts loaded globally; avoid per-screen gating
+// Avoid custom keyboard wrapper to prevent touch interception
 
 export default function ContactScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const safeBack = useSafeBack();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
 
@@ -44,16 +40,7 @@ export default function ContactScreen() {
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
 
-  const [fontsLoaded] = useFonts({
-    Inter_400Regular,
-    Inter_500Medium,
-    Inter_600SemiBold,
-    Inter_700Bold,
-  });
-
-  if (!fontsLoaded) {
-    return null;
-  }
+  // Do not block render on fonts
 
   const colors = {
     primary: isDark ? "#FFFFFF" : "#000000",
@@ -133,7 +120,7 @@ export default function ContactScreen() {
   const handleSubmit = () => {
     if (isFormValid()) {
       // API call here
-      router.back();
+  safeBack();
     }
   };
 
@@ -250,7 +237,6 @@ export default function ContactScreen() {
   };
 
   return (
-    <KeyboardAvoidingAnimatedView style={{ flex: 1 }} behavior="padding">
       <View style={{ flex: 1, backgroundColor: colors.background }}>
         <StatusBar style={isDark ? "light" : "dark"} />
 
@@ -278,7 +264,7 @@ export default function ContactScreen() {
             }}
           >
             <TouchableOpacity
-              onPress={() => router.back()}
+              onPress={safeBack}
               style={{
                 width: 40,
                 height: 40,
@@ -307,6 +293,7 @@ export default function ContactScreen() {
         <ScrollView
           style={{ flex: 1 }}
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
           contentContainerStyle={{ padding: 24, paddingBottom: 100 }}
         >
           {/* Contact Banner */}
@@ -627,6 +614,5 @@ export default function ContactScreen() {
           </TouchableOpacity>
         </View>
       </View>
-    </KeyboardAvoidingAnimatedView>
   );
 }

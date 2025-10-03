@@ -1,13 +1,17 @@
 {
   "name": "mobile",
-  "main": "index.tsx",
+  "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
     "postinstall": "node scripts/postinstall.cjs",
     "start": "expo start",
+    "start:clear": "expo start -c",
+    "start:tunnel": "expo start --tunnel",
     "android": "expo run:android",
+    "android:client": "expo start --dev-client",
     "ios": "expo run:ios",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "adb:reverse": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"$adbRoots=@($env:ANDROID_SDK_ROOT,$env:ANDROID_HOME,(Join-Path $env:LOCALAPPDATA 'Android\\Sdk')); $adbExe=''; foreach ($root in $adbRoots) { if ($root -and (Test-Path (Join-Path $root 'platform-tools\\adb.exe'))) { $adbExe=(Join-Path $root 'platform-tools\\adb.exe'); break } }; if (-not $adbExe) { $adbExe='adb' }; & $adbExe reverse --remove-all; & $adbExe reverse tcp:8081 tcp:8081\""
   },
   "dependencies": {
     "@expo-google-fonts/dev": "^0.4.7",
@@ -80,6 +84,8 @@
     "@types/react": "~19.1.10",
     "autoprefixer": "10.4.20",
     "babel-plugin-module-resolver": "^5.0.2",
+    "babel-plugin-transform-remove-console": "^6.9.4",
+    "expo-dev-client": "^6.0.13",
     "patch-package": "^8.0.0",
     "postcss": "8.5.2",
     "typescript": "~5.9.2"

@@ -16,7 +16,13 @@ export const useSettingsStore = create((set, get) => ({
   ...defaultState,
   init: async () => {
     try {
-      const raw = await SecureStore.getItemAsync(settingsKey);
+      // Race condition: timeout after 1.5s to prevent hanging
+      const timeoutPromise = new Promise((resolve) => 
+        setTimeout(() => resolve(null), 1500)
+      );
+      const dataPromise = SecureStore.getItemAsync(settingsKey);
+      
+      const raw = await Promise.race([dataPromise, timeoutPromise]);
       if (raw) {
         const parsed = JSON.parse(raw);
         set({ ...defaultState, ...parsed, isReady: true });
@@ -37,7 +43,7 @@ export const useSettingsStore = create((set, get) => ({
       appearance: next.appearance,
       language: next.language,
     };
-    await SecureStore.setItemAsync(settingsKey, JSON.stringify(serializable));
+    SecureStore.setItemAsync(settingsKey, JSON.stringify(serializable)).catch(() => {});
     set(partial);
   },
 }));

@@ -24,18 +24,13 @@ import {
   Send,
 } from "lucide-react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import {
-  useFonts,
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_700Bold,
-} from "@expo-google-fonts/inter";
-import KeyboardAvoidingAnimatedView from "@/components/KeyboardAvoidingAnimatedView";
+import { useSafeBack } from '@/utils/navigation';
+// Fonts loaded globally; avoid per-screen gating
 
 export default function ReviewDetailScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const safeBack = useSafeBack();
   const params = useLocalSearchParams();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
@@ -43,16 +38,7 @@ export default function ReviewDetailScreen() {
   const [liked, setLiked] = useState(false);
   const [disliked, setDisliked] = useState(false);
 
-  const [fontsLoaded] = useFonts({
-    Inter_400Regular,
-    Inter_500Medium,
-    Inter_600SemiBold,
-    Inter_700Bold,
-  });
-
-  if (!fontsLoaded) {
-    return null;
-  }
+  // Do not block render on fonts; rely on global loading/fallback
 
   const colors = {
     primary: isDark ? "#FFFFFF" : "#000000",
@@ -199,7 +185,6 @@ export default function ReviewDetailScreen() {
   );
 
   return (
-    <KeyboardAvoidingAnimatedView style={{ flex: 1 }} behavior="padding">
       <View style={{ flex: 1, backgroundColor: colors.background }}>
         <StatusBar style={isDark ? "light" : "dark"} />
 
@@ -227,7 +212,7 @@ export default function ReviewDetailScreen() {
             }}
           >
             <TouchableOpacity
-              onPress={() => router.back()}
+              onPress={safeBack}
               style={{
                 width: 40,
                 height: 40,
@@ -676,6 +661,5 @@ export default function ReviewDetailScreen() {
           </TouchableOpacity>
         </View>
       </View>
-    </KeyboardAvoidingAnimatedView>
   );
 }

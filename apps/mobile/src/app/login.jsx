@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, useColorScheme } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -9,9 +9,18 @@ export default function LoginScreen() {
   const insets = useSafeAreaInsets();
   const isDark = useColorScheme() === 'dark';
   const router = useRouter();
-  const { setAuth } = useAuth();
+  const { setAuth, isAuthenticated, auth } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  // Auto-navigate if already authenticated
+  useEffect(() => {
+    if (isAuthenticated && auth?.verified) {
+      router.replace('/(tabs)/home');
+    } else if (isAuthenticated && !auth?.verified) {
+      router.replace('/(auth)/verify-profile');
+    }
+  }, [isAuthenticated, auth?.verified, router]);
 
   const colors = {
     primary: isDark ? '#FFFFFF' : '#000000',
@@ -23,9 +32,9 @@ export default function LoginScreen() {
   };
 
   const onLogin = () => {
-    // Demo: set a minimal auth object without verified
-    setAuth({ jwt: 'demo', email, verified: false });
-    router.replace('/verify-profile');
+    // Demo: Direkt verified=true ile home'a git (daha basit flow)
+    setAuth({ jwt: 'demo-token', email, verified: true });
+    router.replace('/(tabs)/home');
   };
 
   return (
@@ -37,7 +46,7 @@ export default function LoginScreen() {
       <TouchableOpacity onPress={onLogin} style={{ backgroundColor: colors.accent, padding: 14, borderRadius: 12, alignItems: 'center' }}>
         <Text style={{ color: 'white', fontSize: 16 }}>Giriş</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => router.push('/signup')} style={{ padding: 14, alignItems: 'center', marginTop: 8 }}>
+  <TouchableOpacity onPress={() => router.push('/(auth)/signup')} style={{ padding: 14, alignItems: 'center', marginTop: 8 }}>
         <Text style={{ color: colors.secondary, fontSize: 14 }}>Hesabın yok mu? Kayıt Ol</Text>
       </TouchableOpacity>
     </View>

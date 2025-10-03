@@ -22,32 +22,18 @@ import {
   Mail,
 } from "lucide-react-native";
 import { useRouter } from "expo-router";
-import {
-  useFonts,
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_700Bold,
-} from "@expo-google-fonts/inter";
+import { useSafeBack } from '@/utils/navigation';
 
 export default function HelpScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const safeBack = useSafeBack();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedIndex, setExpandedIndex] = useState(null);
 
-  const [fontsLoaded] = useFonts({
-    Inter_400Regular,
-    Inter_500Medium,
-    Inter_600SemiBold,
-    Inter_700Bold,
-  });
-
-  if (!fontsLoaded) {
-    return null;
-  }
+  // Do not block render on fonts; rely on global loading/fallback
 
   const colors = {
     primary: isDark ? "#FFFFFF" : "#000000",
@@ -340,7 +326,7 @@ export default function HelpScreen() {
           }}
         >
           <TouchableOpacity
-            onPress={() => router.back()}
+            onPress={safeBack}
             style={{
               width: 40,
               height: 40,

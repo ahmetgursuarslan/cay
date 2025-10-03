@@ -4,11 +4,13 @@ import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ArrowLeft, Check } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
+import { useSafeBack } from '@/utils/navigation';
 import { useSettingsStore } from '@/utils/settings/store';
 
 export default function ThemeSettings() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const safeBack = useSafeBack();
   const systemDark = useColorScheme() === 'dark';
   const colors = { background: systemDark ? '#1F1F1F' : '#F9FAFB', surface: systemDark ? '#2A2A2A' : '#FFFFFF', border: systemDark ? '#374151' : '#E5E7EB', primary: systemDark ? '#fff' : '#000', secondary: systemDark ? '#CCCCCC' : '#6B7280', accent:'#16A34A', accentLight:'#DCFCE7' };
   const { init, isReady, appearance, save } = useSettingsStore();
@@ -23,14 +25,14 @@ export default function ThemeSettings() {
   const onSelect = async (key) => {
     setTheme(key);
     await save({ appearance: { theme: key } });
-    router.back();
+    safeBack();
   };
   return (
     <View style={{ flex:1, backgroundColor: colors.background }}>
       <StatusBar style={systemDark ? 'light' : 'dark'} />
       <View style={{ paddingTop: insets.top + 16, paddingBottom: 16, paddingHorizontal: 16, backgroundColor: colors.surface, borderBottomWidth:1, borderBottomColor: colors.border }}>
         <View style={{ flexDirection:'row', alignItems:'center', justifyContent:'space-between' }}>
-          <TouchableOpacity onPress={() => router.back()} style={{ width:40, height:40, borderRadius:20, alignItems:'center', justifyContent:'center', backgroundColor: colors.background }}>
+          <TouchableOpacity onPress={safeBack} style={{ width:40, height:40, borderRadius:20, alignItems:'center', justifyContent:'center', backgroundColor: colors.background }}>
             <ArrowLeft size={20} color={colors.primary} />
           </TouchableOpacity>
           <Text style={{ color: colors.primary, fontSize: 18, fontWeight:'600' }}>Tema Ayarları</Text>

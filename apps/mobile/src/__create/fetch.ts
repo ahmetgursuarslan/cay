@@ -39,61 +39,37 @@ type Params = Parameters<typeof fetch>;
 const fetchToWeb = async function fetchWithHeaders(...args: Params) {
   const firstPartyURL = process.env.EXPO_PUBLIC_BASE_URL;
   const secondPartyURL = process.env.EXPO_PUBLIC_PROXY_BASE_URL;
-  if (!firstPartyURL || !secondPartyURL) {
-  return fetch(...args);
-  }
+  
+  // MOCK MODE: No backend, return mock success for all API calls
   const [input, init] = args;
   const url = getURLFromArgs(input, init);
-  if (!url) {
-  return fetch(input, init);
+  
+  if (url && (url.startsWith('/') || isFirstPartyURL(url) || isSecondPartyURL(url))) {
+    return Promise.resolve({
+      ok: true,
+      status: 200,
+      statusText: 'OK',
+      json: async () => ({ success: true, data: null }),
+      text: async () => JSON.stringify({ success: true, data: null }),
+      headers: new Headers({ 'content-type': 'application/json' }),
+      redirected: false,
+      type: 'basic',
+      url: url,
+      clone: function() { return this; },
+      arrayBuffer: async () => new ArrayBuffer(0),
+      blob: async () => new Blob([]),
+      formData: async () => new FormData(),
+      bodyUsed: false,
+      body: null,
+    } as Response);
   }
-
-  const isExternalFetch = !isFirstPartyURL(url);
-  // we should not add headers to requests that don't go to our own server
-  if (isExternalFetch) {
-  return fetch(input, init);
+  
+  // For external URLs, use original fetch
+  if (!firstPartyURL || !secondPartyURL) {
+    return originalFetch(...args);
   }
-
-  let finalInput = input;
-  const baseURL = isSecondPartyURL(url) ? secondPartyURL : firstPartyURL;
-  if (typeof input === 'string') {
-    finalInput = input.startsWith('/') ? `${baseURL}${input}` : input;
-  } else {
-    return originalFetch(input, init);
-  }
-
-  const initHeaders = init?.headers ?? {};
-  const finalHeaders = new Headers(initHeaders);
-
-  const headers = {
-    'x-createxyz-project-group-id': process.env.EXPO_PUBLIC_PROJECT_GROUP_ID,
-    host: process.env.EXPO_PUBLIC_HOST,
-    'x-forwarded-host': process.env.EXPO_PUBLIC_HOST,
-    'x-createxyz-host': process.env.EXPO_PUBLIC_HOST,
-  };
-
-  for (const [key, value] of Object.entries(headers)) {
-    if (value) {
-      finalHeaders.set(key, value);
-    }
-  }
-
-  const auth = await SecureStore.getItemAsync(authKey)
-    .then((auth) => {
-      return auth ? JSON.parse(auth) : null;
-    })
-    .catch(() => {
-      return null;
-    });
-
-  if (auth) {
-    finalHeaders.set('authorization', `Bearer ${auth.jwt}`);
-  }
-
-  return fetch(finalInput, {
-    ...init,
-    headers: finalHeaders,
-  });
+  
+  return originalFetch(input, init);
 };
 
 export default fetchToWeb;

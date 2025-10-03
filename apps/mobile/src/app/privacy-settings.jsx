@@ -4,10 +4,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ArrowLeft, Lock } from 'lucide-react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useRouter } from 'expo-router';
+import { useSafeBack } from '@/utils/navigation';
 
 export default function PrivacySettings() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const safeBack = useSafeBack();
   const isDark = useColorScheme() === 'dark';
 
   const colors = {
@@ -35,7 +37,7 @@ export default function PrivacySettings() {
       >
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <TouchableOpacity
-            onPress={() => router.back()}
+            onPress={safeBack}
             style={{
               width: 40,
               height: 40,

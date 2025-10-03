@@ -17,17 +17,24 @@ export const useAuth = () => {
   const { isOpen, close, open } = useAuthModal();
 
   const initiate = useCallback(() => {
-    SecureStore.getItemAsync(authKey)
-      .then((auth) => {
-        useAuthStore.setState({
-          auth: auth ? JSON.parse(auth) : null,
-          isReady: true,
-        });
-      })
-      .catch(() => {
-        // If SecureStore fails (e.g., device lock or permission), don't block the app
+    let didSet = false;
+    const finish = (stored) => {
+      if (didSet) return;
+      didSet = true;
+      try {
+        const parsed = stored ? JSON.parse(stored) : null;
+        useAuthStore.setState({ auth: parsed, isReady: true });
+      } catch (_) {
         useAuthStore.setState({ auth: null, isReady: true });
-      });
+      }
+    };
+
+    // Fallback timeout so UI never blocks if SecureStore hangs
+    const timeout = setTimeout(() => finish(null), 1500);
+    SecureStore.getItemAsync(authKey)
+      .then((auth) => finish(auth))
+      .catch(() => finish(null))
+      .finally(() => clearTimeout(timeout));
   }, []);
 
   useEffect(() => {}, []);
