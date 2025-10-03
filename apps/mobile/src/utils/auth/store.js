@@ -1,7 +1,11 @@
 import { create } from 'zustand';
 import * as SecureStore from 'expo-secure-store';
 
-export const authKey = `${process.env.EXPO_PUBLIC_PROJECT_GROUP_ID}-jwt`;
+// GPT5-AUTO-FIX: Guard env access in native/Hermes builds
+const groupId = (typeof process !== 'undefined' && process?.env?.EXPO_PUBLIC_PROJECT_GROUP_ID)
+  ? process.env.EXPO_PUBLIC_PROJECT_GROUP_ID
+  : 'app';
+export const authKey = `${groupId}-jwt`;
 
 /**
  * This store manages the authentication state of the application.

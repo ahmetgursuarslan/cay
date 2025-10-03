@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   useColorScheme,
   TextInput,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -31,7 +33,7 @@ import {
   Inter_600SemiBold,
   Inter_700Bold,
 } from "@expo-google-fonts/inter";
-import KeyboardAvoidingAnimatedView from "@/components/KeyboardAvoidingAnimatedView";
+// Use native KeyboardAvoidingView to avoid rare freezes seen with custom animated wrapper
 
 export default function ReviewDetailScreen() {
   const insets = useSafeAreaInsets();
@@ -199,7 +201,7 @@ export default function ReviewDetailScreen() {
   );
 
   return (
-    <KeyboardAvoidingAnimatedView style={{ flex: 1 }} behavior="padding">
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <View style={{ flex: 1, backgroundColor: colors.background }}>
         <StatusBar style={isDark ? "light" : "dark"} />
 
@@ -270,6 +272,8 @@ export default function ReviewDetailScreen() {
           style={{ flex: 1 }}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 120 }}
+          keyboardShouldPersistTaps="always"
+          keyboardDismissMode="on-drag"
         >
           {/* Review Card */}
           <View style={{ paddingHorizontal: 24, paddingTop: 24 }}>
@@ -676,6 +680,6 @@ export default function ReviewDetailScreen() {
           </TouchableOpacity>
         </View>
       </View>
-    </KeyboardAvoidingAnimatedView>
+    </KeyboardAvoidingView>
   );
 }

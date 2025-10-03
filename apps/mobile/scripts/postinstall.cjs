@@ -109,6 +109,41 @@ if (result.status === 0) {
   process.exit(0);
 }
 
+// Auto-heal: if failure due to missing es-object-atoms (transitive of get-intrinsic in some node distros), try installing and retry once
+try {
+  const logFile = join(mobileRoot, 'patch-fail-temp.log');
+  // We don't have direct stderr capture (inherit), so infer by stack presence in previous require error env var if any future enhancement.
+  // Simple heuristic: re-require get-intrinsic chain; if throws missing es-object-atoms, fix.
+  let needRetry = false;
+  try { require('get-intrinsic'); } catch (e) {
+    if (e && /es-object-atoms/i.test(String(e.message))) {
+      console.warn('[postinstall] Detected missing es-object-atoms dependency; attempting auto-install...');
+      needRetry = true;
+    }
+  }
+  if (needRetry) {
+    const install = spawnSync(process.execPath, ['../node_modules/npm/bin/npm-cli.js', 'install', 'es-object-atoms@^1.0.0', '--no-audit', '--no-fund'], { stdio: 'inherit', cwd: mobileRoot });
+    if (install.status === 0) {
+      console.log('[postinstall] es-object-atoms installed. Retrying patch-package once...');
+      try {
+        const retry = spawnSync(process.execPath, [entry || require.resolve('patch-package/dist/index.js', { paths: [mobileRoot] })], { stdio: 'inherit', cwd: mobileRoot });
+        if (retry.status === 0) {
+          console.log('[postinstall] patch-package succeeded on retry after installing es-object-atoms');
+          process.exit(0);
+        } else {
+          console.warn('[postinstall] Retry still failed; continuing to fallback logic.');
+        }
+      } catch (e) {
+        console.warn('[postinstall] Retry attempt threw error:', e && e.message);
+      }
+    } else {
+      console.warn('[postinstall] Auto-install of es-object-atoms failed; proceeding with existing failure path.');
+    }
+  }
+} catch (e) {
+  console.warn('[postinstall] Auto-heal block error:', e && e.message);
+}
+
 // Fallback: try GNU patch (useful when patch-package fails to parse but unified diffs are valid)
 function hasGNUPatch() {
   const probe = spawnSync('patch', ['--version'], { stdio: 'ignore' });

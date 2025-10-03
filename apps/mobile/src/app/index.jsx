@@ -1,22 +1,7 @@
-import { Redirect } from "expo-router";
 import React from 'react';
-import { View, ActivityIndicator } from 'react-native';
-import { useAuth } from "@/utils/auth/useAuth";
+import { Redirect } from 'expo-router';
 
+// Auth bypass: always go to home
 export default function Index() {
-  const { isReady, isAuthenticated, auth } = useAuth();
-  if (!isReady) {
-    return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <ActivityIndicator size="small" color="#16A34A" />
-      </View>
-    );
-  }
-  if (!isAuthenticated) {
-    return <Redirect href="/login" />;
-  }
-  if (!auth?.verified) {
-    return <Redirect href="/verify-profile" />;
-  }
   return <Redirect href="/(tabs)/home" />;
 }

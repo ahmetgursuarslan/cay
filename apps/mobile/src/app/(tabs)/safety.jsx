@@ -328,8 +328,8 @@ export default function SafetyScreen() {
           shadowOffset: { width: 0, height: 2 },
           shadowOpacity: 0.1,
           shadowRadius: 8,
-          elevation: showHeaderBorder ? 4 : 0,
-          zIndex: 1000,
+          elevation: 0,
+          zIndex: 0,
         }}
       >
         <View

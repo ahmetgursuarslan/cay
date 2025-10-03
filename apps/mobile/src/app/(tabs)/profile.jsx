@@ -25,13 +25,6 @@ import {
   Globe,
 } from "lucide-react-native";
 import { useRouter } from "expo-router";
-import {
-  useFonts,
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_700Bold,
-} from "@expo-google-fonts/inter";
 import { useSettingsStore } from "@/utils/settings/store";
 import { getIsDark, makeColors } from "@/utils/theme";
 
@@ -44,16 +37,7 @@ export default function ProfileScreen() {
   useEffect(() => { init(); }, [init]);
   const isDark = getIsDark(colorScheme === 'dark', appearance?.theme);
 
-  const [fontsLoaded] = useFonts({
-    Inter_400Regular,
-    Inter_500Medium,
-    Inter_600SemiBold,
-    Inter_700Bold,
-  });
-
-  if (!fontsLoaded) {
-    return null;
-  }
+  // Fonts already loaded at root; do not block screen render if fallback occurs.
 
   const colors = makeColors(isDark);
 
@@ -310,8 +294,9 @@ export default function ProfileScreen() {
           shadowOffset: { width: 0, height: 2 },
           shadowOpacity: 0.1,
           shadowRadius: 8,
-          elevation: showHeaderBorder ? 4 : 0,
-          zIndex: 1000,
+          // Simplified to avoid potential touch interception issues
+          elevation: 0,
+          zIndex: 0,
         }}
       >
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>

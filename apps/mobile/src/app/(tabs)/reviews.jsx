@@ -399,8 +399,8 @@ export default function ReviewsScreen() {
           shadowOffset: { width: 0, height: 2 },
           shadowOpacity: 0.1,
           shadowRadius: 8,
-          elevation: showHeaderBorder ? 4 : 0,
-          zIndex: 1000,
+          elevation: 0,
+          zIndex: 0,
         }}
       >
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
@@ -466,7 +466,7 @@ export default function ReviewsScreen() {
             <StatCard
               icon={MessageSquare}
               label="Toplam Yorum"
-              value="1,247"
+              value="1.2K"
               color={colors.accent}
             />
             <StatCard

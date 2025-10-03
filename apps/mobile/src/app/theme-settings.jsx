@@ -1,3 +1,4 @@
+// removed duplicate placeholder; keep full implementation below
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, useColorScheme } from 'react-native';
 import { StatusBar } from 'expo-status-bar';

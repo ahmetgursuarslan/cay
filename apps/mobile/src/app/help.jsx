@@ -22,13 +22,7 @@ import {
   Mail,
 } from "lucide-react-native";
 import { useRouter } from "expo-router";
-import {
-  useFonts,
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_700Bold,
-} from "@expo-google-fonts/inter";
+// Fonts are loaded at root; do not block render here
 
 export default function HelpScreen() {
   const insets = useSafeAreaInsets();
@@ -38,16 +32,7 @@ export default function HelpScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedIndex, setExpandedIndex] = useState(null);
 
-  const [fontsLoaded] = useFonts({
-    Inter_400Regular,
-    Inter_500Medium,
-    Inter_600SemiBold,
-    Inter_700Bold,
-  });
-
-  if (!fontsLoaded) {
-    return null;
-  }
+  // no per-screen font gating
 
   const colors = {
     primary: isDark ? "#FFFFFF" : "#000000",

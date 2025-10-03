@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   TextInput,
   useColorScheme,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -28,7 +30,7 @@ import {
   Inter_600SemiBold,
   Inter_700Bold,
 } from "@expo-google-fonts/inter";
-import KeyboardAvoidingAnimatedView from "@/components/KeyboardAvoidingAnimatedView";
+// Use native KeyboardAvoidingView to avoid rare freezes seen with custom animated wrapper
 
 export default function ReportScreen() {
   const insets = useSafeAreaInsets();
@@ -127,7 +129,7 @@ export default function ReportScreen() {
   );
 
   return (
-    <KeyboardAvoidingAnimatedView style={{ flex: 1 }} behavior="padding">
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <View style={{ flex: 1, backgroundColor: colors.background }}>
         <StatusBar style={isDark ? "light" : "dark"} />
 
@@ -185,6 +187,8 @@ export default function ReportScreen() {
           style={{ flex: 1 }}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ padding: 24, paddingBottom: 100 }}
+          keyboardShouldPersistTaps="always"
+          keyboardDismissMode="on-drag"
         >
           {/* Warning Banner */}
           <View
@@ -651,6 +655,6 @@ export default function ReportScreen() {
           </TouchableOpacity>
         </View>
       </View>
-    </KeyboardAvoidingAnimatedView>
+    </KeyboardAvoidingView>
   );
 }

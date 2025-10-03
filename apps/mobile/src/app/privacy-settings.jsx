@@ -1,3 +1,4 @@
+// cleaned duplicate placeholder component
 import React from 'react';
 import { View, Text, TouchableOpacity, useColorScheme } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';

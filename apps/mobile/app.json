@@ -6,6 +6,7 @@
     "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "automatic",
   "platforms": ["ios", "android"],
+    "scheme": "createxyz",
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
@@ -17,7 +18,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "scheme": "createxyz",
+  "scheme": "createxyz",
       "permissions": [
         "android.permission.RECORD_AUDIO",
         "android.permission.MODIFY_AUDIO_SETTINGS"
@@ -59,7 +60,8 @@
     },
     "extra": {
       "router": {
-        "origin": false
+        "origin": false,
+        "appDir": "src/app"
       }
     },
     "runtimeVersion": {

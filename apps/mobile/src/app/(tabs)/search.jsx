@@ -1,454 +1,158 @@
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  TextInput,
-  useColorScheme,
-} from "react-native";
-import { StatusBar } from "expo-status-bar";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import {
-  Search,
-  User,
-  Phone,
-  Mail,
-  Instagram,
-  Clock,
-  AlertCircle,
-  ChevronRight,
-  X,
-} from "lucide-react-native";
-import { useRouter } from "expo-router";
-import {
-  useFonts,
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_700Bold,
-} from "@expo-google-fonts/inter";
-import KeyboardAvoidingAnimatedView from "@/components/KeyboardAvoidingAnimatedView";
+import React, { useEffect, useMemo, useState } from 'react';
+import { View, Text, TextInput, Pressable, ScrollView, StyleSheet, useColorScheme, ActivityIndicator } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Search as SearchIcon, User, Shield, Star, AlertTriangle } from 'lucide-react-native';
+import { makeColors, getIsDark } from '@/utils/theme';
+import { useSettingsStore } from '@/utils/settings/store';
+
+const DUMMY_DATA = [
+  { id: '1', type: 'profile', name: 'Mehmet K.', safety: 'warning', desc: 'İstanbul • 3 yorum', rating: 2 },
+  { id: '2', type: 'profile', name: 'Ali Y.', safety: 'safe', desc: 'Ankara • 5 yorum', rating: 5 },
+  { id: '3', type: 'profile', name: 'Emre S.', safety: 'danger', desc: 'İzmir • 4 yorum', rating: 1 },
+  { id: '4', type: 'topic', name: 'İlk Buluşma Güvenliği', safety: 'info', desc: 'Rehber • Güvenlik', rating: null },
+  { id: '5', type: 'topic', name: 'Kırmızı Bayrak Örnekleri', safety: 'info', desc: 'Makale • 8 ipucu', rating: null },
+  { id: '6', type: 'profile', name: 'Ahmet D.', safety: 'safe', desc: 'Bursa • 1 yorum', rating: 4 },
+];
+
+const SAFETY_COLORS = (c) => ({
+  safe: { bg: c.accentLight, fg: c.accent, label: 'Güvenli' },
+  warning: { bg: '#FEF3C7', fg: '#F59E0B', label: 'Dikkat' },
+  danger: { bg: '#FEE2E2', fg: '#EF4444', label: 'Riskli' },
+  info: { bg: c.card, fg: c.secondary, label: 'Bilgi' },
+});
 
 export default function SearchScreen() {
   const insets = useSafeAreaInsets();
-  const router = useRouter();
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
-  const [showHeaderBorder, setShowHeaderBorder] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [activeSearchType, setActiveSearchType] = useState("name");
+  const systemDark = useColorScheme() === 'dark';
+  const { appearance } = useSettingsStore();
+  const isDark = getIsDark(systemDark, appearance?.theme);
+  const colors = makeColors(isDark);
 
-  const [fontsLoaded] = useFonts({
-    Inter_400Regular,
-    Inter_500Medium,
-    Inter_600SemiBold,
-    Inter_700Bold,
-  });
+  const [query, setQuery] = useState('');
+  const [debounced, setDebounced] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  if (!fontsLoaded) {
-    return null;
-  }
+  useEffect(() => {
+    setLoading(true);
+    const t = setTimeout(() => { setDebounced(query.trim()); setLoading(false); }, 450);
+    return () => clearTimeout(t);
+  }, [query]);
 
-  const colors = {
-    primary: isDark ? "#FFFFFF" : "#000000",
-    secondary: isDark ? "#CCCCCC" : "#6B7280",
-    accent: "#16A34A",
-    accentLight: "#DCFCE7",
-    white: isDark ? "#121212" : "#FFFFFF",
-    background: isDark ? "#1F1F1F" : "#F9FAFB",
-    card: isDark ? "#2A2A2A" : "#FFFFFF",
-    border: isDark ? "#374151" : "#E5E7EB",
-    danger: "#EF4444",
-    warning: "#F59E0B",
-  };
+  const results = useMemo(() => {
+    if (!debounced) return [];
+    const q = debounced.toLowerCase();
+    return DUMMY_DATA.filter(item => item.name.toLowerCase().includes(q));
+  }, [debounced]);
 
-  const handleScroll = (event) => {
-    const scrollY = event.nativeEvent.contentOffset.y;
-    setShowHeaderBorder(scrollY > 0);
-  };
+  const safetyTokens = SAFETY_COLORS(colors);
 
-  const SearchTypeButton = ({ type, icon: IconComponent, label, isActive, onPress }) => (
-    <TouchableOpacity
-      style={{
-        flexDirection: "row",
-        alignItems: "center",
-        backgroundColor: isActive ? colors.accent : colors.card,
-        paddingHorizontal: 16,
-        paddingVertical: 12,
-        borderRadius: 12,
-        marginRight: 12,
-        borderWidth: 1,
-        borderColor: isActive ? colors.accent : colors.border,
-      }}
-      onPress={onPress}
-      activeOpacity={0.8}
-    >
-      <IconComponent
-        size={18}
-        color={isActive ? "white" : colors.primary}
-      />
-      <Text
-        style={{
-          fontFamily: "Inter_500Medium",
-          fontSize: 14,
-          color: isActive ? "white" : colors.primary,
-          marginLeft: 8,
-        }}
-      >
-        {label}
-      </Text>
-    </TouchableOpacity>
-  );
-
-  const RecentSearchItem = ({ name, type, date, risk }) => (
-    <TouchableOpacity
-      style={{
-        backgroundColor: colors.card,
-        borderRadius: 16,
-        padding: 16,
-        marginBottom: 12,
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-      }}
-      activeOpacity={0.9}
-    >
-      <View style={{ flex: 1 }}>
-        <Text
-          style={{
-            fontFamily: "Inter_600SemiBold",
-            fontSize: 16,
-            color: colors.primary,
-            marginBottom: 4,
-          }}
-        >
-          {name}
-        </Text>
-        <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 2 }}>
-          <Text
-            style={{
-              fontFamily: "Inter_400Regular",
-              fontSize: 12,
-              color: colors.secondary,
-              marginRight: 12,
-            }}
-          >
-            {type}
-          </Text>
-          <Text
-            style={{
-              fontFamily: "Inter_400Regular",
-              fontSize: 12,
-              color: colors.secondary,
-            }}
-          >
-            {date}
-          </Text>
-        </View>
-        <View style={{ flexDirection: "row", alignItems: "center", marginTop: 4 }}>
-          <View
-            style={{
-              width: 8,
-              height: 8,
-              borderRadius: 4,
-              backgroundColor: risk === "low" ? colors.accent : risk === "medium" ? colors.warning : colors.danger,
-              marginRight: 6,
-            }}
-          />
-          <Text
-            style={{
-              fontFamily: "Inter_500Medium",
-              fontSize: 12,
-              color: risk === "low" ? colors.accent : risk === "medium" ? colors.warning : colors.danger,
-            }}
-          >
-            {risk === "low" ? "Düşük Risk" : risk === "medium" ? "Orta Risk" : "Yüksek Risk"}
-          </Text>
-        </View>
+  const renderBadge = (item) => {
+    if (item.type === 'topic') return null;
+    const tok = safetyTokens[item.safety] || safetyTokens.info;
+    return (
+      <View style={{ backgroundColor: tok.bg, paddingHorizontal:10, paddingVertical:4, borderRadius: 14, marginRight:8 }}>
+        <Text style={{ color: tok.fg, fontSize:11, fontWeight:'600' }}>{tok.label}</Text>
       </View>
-      <ChevronRight size={20} color={colors.secondary} />
-    </TouchableOpacity>
-  );
+    );
+  };
 
-  const recentSearches = [
-    { name: "Ahmet Yılmaz", type: "İsim Arama", date: "2 saat önce", risk: "low" },
-    { name: "+90 555 123 45 67", type: "Telefon Arama", date: "1 gün önce", risk: "medium" },
-    { name: "mehmet_istanbul", type: "Instagram", date: "3 gün önce", risk: "low" },
-  ];
+  const renderStars = (rating) => {
+    if (!rating) return null;
+    return (
+      <View style={{ flexDirection:'row', marginLeft: 'auto' }}>
+        {Array.from({ length:5 }).map((_,i)=>(
+          <Star key={i} size={14} color={i < rating ? '#F59E0B' : colors.border} fill={i < rating ? '#F59E0B' : 'transparent'} style={{ marginLeft:2 }} />
+        ))}
+      </View>
+    );
+  };
+
+  const ContentState = () => {
+    if (!query) return (
+      <View style={styles.stateWrap}> 
+        <SearchIcon size={42} color={colors.secondary} />
+        <Text style={[styles.stateTitle, { color: colors.primary }]}>Arama Yap</Text>
+        <Text style={[styles.stateDesc, { color: colors.secondary }]}>Profil veya konu ismi yazmaya başla.</Text>
+      </View>
+    );
+    if (loading) return (
+      <View style={styles.stateWrap}> 
+        <ActivityIndicator color={colors.accent} />
+        <Text style={[styles.stateDesc, { color: colors.secondary, marginTop:12 }]}>Aranıyor…</Text>
+      </View>
+    );
+    if (debounced && results.length === 0) return (
+      <View style={styles.stateWrap}> 
+        <AlertTriangle size={40} color={colors.warning} />
+        <Text style={[styles.stateTitle, { color: colors.primary }]}>Sonuç Yok</Text>
+        <Text style={[styles.stateDesc, { color: colors.secondary }]}>Farklı bir kelime dene.</Text>
+      </View>
+    );
+    return (
+      <View style={{ paddingHorizontal:24, paddingTop:8 }}>
+        <Text style={{ fontSize:14, fontWeight:'600', color: colors.secondary, marginBottom:12 }}>{results.length} sonuç</Text>
+        {results.map(item => (
+          <Pressable
+            key={item.id}
+            onPress={() => console.log('[SEARCH] item press', item.id)}
+            android_ripple={{ color: colors.accent + '22' }}
+            style={({ pressed }) => [{ backgroundColor: colors.card, borderWidth:1, borderColor: colors.border, padding:16, borderRadius:18, marginBottom:14, shadowColor:'#000', shadowOpacity:isDark?0.4:0.08, shadowRadius:6, shadowOffset:{ width:0, height:2 }, transform:[{ scale: pressed ? 0.97 : 1 }] }]}
+          >
+            <View style={{ flexDirection:'row', alignItems:'center', marginBottom:10 }}>
+              <View style={{ width:46, height:46, borderRadius:16, backgroundColor: colors.accentLight, alignItems:'center', justifyContent:'center', marginRight:12 }}>
+                {item.type === 'profile' ? <User size={24} color={colors.accent} /> : <SearchIcon size={24} color={colors.accent} />}
+              </View>
+              <View style={{ flex:1 }}>
+                <Text style={{ fontSize:16, fontWeight:'600', color: colors.primary, marginBottom:2 }}>{item.name}</Text>
+                <Text style={{ fontSize:12, fontWeight:'500', color: colors.secondary }}>{item.desc}</Text>
+              </View>
+              {renderStars(item.rating)}
+            </View>
+            <View style={{ flexDirection:'row', alignItems:'center' }}>
+              {renderBadge(item)}
+              {item.type === 'topic' && (
+                <View style={{ backgroundColor: colors.accentLight, paddingHorizontal:10, paddingVertical:4, borderRadius:14 }}>
+                  <Text style={{ color: colors.accent, fontSize:11, fontWeight:'600' }}>Rehber</Text>
+                </View>
+              )}
+            </View>
+          </Pressable>
+        ))}
+      </View>
+    );
+  };
 
   return (
-    <KeyboardAvoidingAnimatedView style={{ flex: 1 }} behavior="padding">
-      <View style={{ flex: 1, backgroundColor: colors.background }}>
-        <StatusBar style={isDark ? "light" : "dark"} />
-
-        {/* Fixed Header */}
-        <View
-          style={{
-            backgroundColor: colors.white,
-            paddingTop: insets.top + 16,
-            paddingBottom: 20,
-            paddingHorizontal: 24,
-            borderBottomWidth: showHeaderBorder ? 1 : 0,
-            borderBottomColor: colors.border,
-            shadowColor: showHeaderBorder ? "#000" : "transparent",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.1,
-            shadowRadius: 8,
-            elevation: showHeaderBorder ? 4 : 0,
-            zIndex: 1000,
-          }}
-        >
-          <Text
-            style={{
-              fontFamily: "Inter_700Bold",
-              fontSize: 24,
-              color: colors.primary,
-              marginBottom: 8,
-            }}
-          >
-            Araştırma Merkezi
-          </Text>
-          <Text
-            style={{
-              fontFamily: "Inter_400Regular",
-              fontSize: 14,
-              color: colors.secondary,
-            }}
-          >
-            Tanıştığın kişileri güvenli şekilde araştır
-          </Text>
+    <View style={{ flex:1, backgroundColor: colors.background }}>
+      <ScrollView style={{ flex:1 }} keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: insets.bottom + 60 }}>
+        <View style={{ paddingTop: insets.top + 32, paddingHorizontal:24, paddingBottom:12 }}>
+          <Text style={{ fontSize:26, fontWeight:'700', color: colors.primary, marginBottom:4 }}>Arama</Text>
+          <Text style={{ fontSize:13, fontWeight:'500', color: colors.secondary, marginBottom:16 }}>Kullanıcıları veya güvenlik konularını keşfet</Text>
+          <View style={{ flexDirection:'row', alignItems:'center', backgroundColor: colors.card, borderWidth:1, borderColor: colors.border, borderRadius:16, paddingHorizontal:14 }}> 
+            <SearchIcon size={18} color={colors.secondary} />
+            <TextInput
+              style={{ flex:1, paddingVertical:10, paddingHorizontal:8, fontSize:15, color: colors.primary }}
+              placeholder='İsim veya konu ara...'
+              placeholderTextColor={colors.secondary}
+              value={query}
+              onChangeText={setQuery}
+              returnKeyType='search'
+            />
+            {query.length > 0 && (
+              <Pressable onPress={() => setQuery('')} hitSlop={10} style={{ padding:4 }}>
+                <Text style={{ color: colors.secondary, fontWeight:'600' }}>×</Text>
+              </Pressable>
+            )}
+          </View>
         </View>
-
-        <ScrollView
-          style={{ flex: 1 }}
-          contentContainerStyle={{ paddingBottom: insets.bottom + 100 }}
-          showsVerticalScrollIndicator={false}
-          onScroll={handleScroll}
-          scrollEventThrottle={16}
-        >
-          {/* Search Types */}
-          <View style={{ paddingHorizontal: 24, paddingTop: 24 }}>
-            <Text
-              style={{
-                fontFamily: "Inter_600SemiBold",
-                fontSize: 16,
-                color: colors.primary,
-                marginBottom: 16,
-              }}
-            >
-              Arama Türü Seç
-            </Text>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              style={{ marginBottom: 24 }}
-            >
-              <SearchTypeButton
-                type="name"
-                icon={User}
-                label="İsim"
-                isActive={activeSearchType === "name"}
-                onPress={() => setActiveSearchType("name")}
-              />
-              <SearchTypeButton
-                type="phone"
-                icon={Phone}
-                label="Telefon"
-                isActive={activeSearchType === "phone"}
-                onPress={() => setActiveSearchType("phone")}
-              />
-              <SearchTypeButton
-                type="email"
-                icon={Mail}
-                label="Email"
-                isActive={activeSearchType === "email"}
-                onPress={() => setActiveSearchType("email")}
-              />
-              <SearchTypeButton
-                type="social"
-                icon={Instagram}
-                label="Sosyal Medya"
-                isActive={activeSearchType === "social"}
-                onPress={() => setActiveSearchType("social")}
-              />
-            </ScrollView>
-
-            {/* Search Input */}
-            <View
-              style={{
-                backgroundColor: colors.card,
-                borderRadius: 16,
-                paddingHorizontal: 20,
-                paddingVertical: 16,
-                marginBottom: 24,
-                shadowColor: isDark ? "#000" : "#000",
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: isDark ? 0.5 : 0.1,
-                shadowRadius: 8,
-                elevation: 2,
-              }}
-            >
-              <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 12 }}>
-                <Search size={20} color={colors.accent} />
-                <Text
-                  style={{
-                    fontFamily: "Inter_600SemiBold",
-                    fontSize: 16,
-                    color: colors.primary,
-                    marginLeft: 12,
-                  }}
-                >
-                  {activeSearchType === "name" && "İsim ile Ara"}
-                  {activeSearchType === "phone" && "Telefon ile Ara"}
-                  {activeSearchType === "email" && "Email ile Ara"}
-                  {activeSearchType === "social" && "Sosyal Medya ile Ara"}
-                </Text>
-              </View>
-              
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <TextInput
-                  style={{
-                    flex: 1,
-                    fontFamily: "Inter_400Regular",
-                    fontSize: 16,
-                    color: colors.primary,
-                    paddingVertical: 8,
-                  }}
-                  placeholder={
-                    activeSearchType === "name" ? "Örn: Ahmet Yılmaz" :
-                    activeSearchType === "phone" ? "Örn: +90 555 123 45 67" :
-                    activeSearchType === "email" ? "Örn: ahmet@example.com" :
-                    "Örn: @ahmet_istanbul"
-                  }
-                  placeholderTextColor={colors.secondary}
-                  value={searchQuery}
-                  onChangeText={setSearchQuery}
-                  returnKeyType="search"
-                />
-                {searchQuery.length > 0 && (
-                  <TouchableOpacity
-                    onPress={() => setSearchQuery("")}
-                    style={{ padding: 4 }}
-                  >
-                    <X size={18} color={colors.secondary} />
-                  </TouchableOpacity>
-                )}
-              </View>
-
-              <TouchableOpacity
-                style={{
-                  backgroundColor: colors.accent,
-                  borderRadius: 12,
-                  paddingVertical: 14,
-                  alignItems: "center",
-                  marginTop: 16,
-                }}
-                disabled={searchQuery.length === 0}
-                activeOpacity={0.8}
-              >
-                <Text
-                  style={{
-                    fontFamily: "Inter_600SemiBold",
-                    fontSize: 16,
-                    color: "white",
-                  }}
-                >
-                  Araştırmaya Başla
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* Warning */}
-            <View
-              style={{
-                backgroundColor: "#FFF7ED",
-                borderRadius: 12,
-                padding: 16,
-                flexDirection: "row",
-                marginBottom: 32,
-                borderLeftWidth: 4,
-                borderLeftColor: colors.warning,
-              }}
-            >
-              <AlertCircle size={20} color={colors.warning} style={{ marginRight: 12, marginTop: 2 }} />
-              <View style={{ flex: 1 }}>
-                <Text
-                  style={{
-                    fontFamily: "Inter_600SemiBold",
-                    fontSize: 14,
-                    color: "#92400E",
-                    marginBottom: 4,
-                  }}
-                >
-                  Önemli Uyarı
-                </Text>
-                <Text
-                  style={{
-                    fontFamily: "Inter_400Regular",
-                    fontSize: 12,
-                    color: "#92400E",
-                    lineHeight: 18,
-                  }}
-                >
-                  Bu araç sadece güvenlik amacıyla kullanılmalıdır. Başkalarının özel hayatını ihlal etmek yasaktır.
-                </Text>
-              </View>
-            </View>
-          </View>
-
-          {/* Recent Searches */}
-          <View style={{ paddingHorizontal: 24 }}>
-            <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 16 }}>
-              <Clock size={20} color={colors.secondary} />
-              <Text
-                style={{
-                  fontFamily: "Inter_600SemiBold",
-                  fontSize: 16,
-                  color: colors.primary,
-                  marginLeft: 8,
-                }}
-              >
-                Son Aramalar
-              </Text>
-            </View>
-
-            {recentSearches.map((search, index) => (
-              <RecentSearchItem
-                key={index}
-                name={search.name}
-                type={search.type}
-                date={search.date}
-                risk={search.risk}
-              />
-            ))}
-
-            <TouchableOpacity
-              style={{
-                backgroundColor: colors.card,
-                borderRadius: 16,
-                padding: 20,
-                alignItems: "center",
-                marginTop: 12,
-                borderWidth: 1,
-                borderColor: colors.border,
-                borderStyle: "dashed",
-              }}
-              activeOpacity={0.8}
-            >
-              <Text
-                style={{
-                  fontFamily: "Inter_500Medium",
-                  fontSize: 14,
-                  color: colors.secondary,
-                }}
-              >
-                Tüm Geçmişi Görüntüle
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-      </View>
-    </KeyboardAvoidingAnimatedView>
+        <ContentState />
+      </ScrollView>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  stateWrap: { alignItems:'center', justifyContent:'center', paddingTop:60 },
+  stateTitle: { fontSize:18, fontWeight:'700', marginTop:16, marginBottom:6 },
+  stateDesc: { fontSize:13, fontWeight:'500' },
+});

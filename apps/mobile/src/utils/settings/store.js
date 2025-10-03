@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import * as SecureStore from 'expo-secure-store';
 
-const settingsKey = `${process.env.EXPO_PUBLIC_PROJECT_GROUP_ID}-settings`;
+// GPT5-AUTO-FIX: Guard env to avoid crashes if undefined under Hermes/release
+const settingsKey = `${process.env.EXPO_PUBLIC_PROJECT_GROUP_ID || 'app'}-settings`;
 
 const defaultState = {
   profile: { firstName: '', lastName: '', bio: '' },
