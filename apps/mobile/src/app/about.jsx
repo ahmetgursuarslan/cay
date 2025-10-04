@@ -44,9 +44,7 @@ export default function AboutScreen() {
     Inter_700Bold,
   });
 
-  if (!fontsLoaded) {
-    return null;
-  }
+  // Render using system fonts if web fonts haven't loaded yet
 
   const colors = {
     primary: isDark ? "#FFFFFF" : "#000000",
@@ -544,7 +542,7 @@ export default function AboutScreen() {
             duyar.
           </Text>
           <TouchableOpacity
-            onPress={() => router.push("/contact")}
+            onPress={() => router.back()}
             style={{
               backgroundColor: colors.accent,
               paddingHorizontal: 20,

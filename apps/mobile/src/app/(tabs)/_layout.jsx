@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import { Home, Search, MessageSquare, Shield, User } from "lucide-react-native";
+import { Home, MessageSquare, Shield, User } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColorScheme } from "react-native";
 
@@ -10,6 +10,7 @@ export default function TabLayout() {
 
   return (
     <Tabs
+      initialRouteName="home"
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
@@ -20,16 +21,10 @@ export default function TabLayout() {
           paddingTop: 10,
           height: 49 + insets.bottom + 10,
         },
-        tabBarActiveTintColor: "#16A34A", // Green color similar to tea app
+        tabBarActiveTintColor: "#16A34A",
         tabBarInactiveTintColor: isDark ? "#8A8A8A" : "#8E8E93",
-        tabBarLabelStyle: {
-          fontSize: 10,
-          fontWeight: "500",
-          marginTop: 2,
-        },
-        tabBarIconStyle: {
-          marginTop: 2,
-        },
+        tabBarLabelStyle: { fontSize: 10, fontWeight: "500", marginTop: 2 },
+        tabBarIconStyle: { marginTop: 2 },
       }}
     >
       <Tabs.Screen
@@ -37,13 +32,6 @@ export default function TabLayout() {
         options={{
           title: "Ana Sayfa",
           tabBarIcon: ({ color }) => <Home size={24} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="search"
-        options={{
-          title: "Araştır",
-          tabBarIcon: ({ color }) => <Search size={24} color={color} />,
         }}
       />
       <Tabs.Screen
@@ -70,3 +58,4 @@ export default function TabLayout() {
     </Tabs>
   );
 }
+

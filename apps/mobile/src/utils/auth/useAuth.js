@@ -19,14 +19,14 @@ export const useAuth = () => {
   const initiate = useCallback(() => {
     SecureStore.getItemAsync(authKey)
       .then((auth) => {
-        useAuthStore.setState({
-          auth: auth ? JSON.parse(auth) : null,
-          isReady: true,
-        });
+        const saved = auth ? JSON.parse(auth) : null;
+        // Demo UI mode: if no saved auth, preload a fake verified user to unblock routing
+        const demoAuth = saved ?? { jwt: 'demo', email: 'demo@cay.app', verified: true };
+        useAuthStore.setState({ auth: demoAuth, isReady: true });
       })
       .catch(() => {
         // If SecureStore fails (e.g., device lock or permission), don't block the app
-        useAuthStore.setState({ auth: null, isReady: true });
+        useAuthStore.setState({ auth: { jwt: 'demo', email: 'demo@cay.app', verified: true }, isReady: true });
       });
   }, []);
 

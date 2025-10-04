@@ -70,14 +70,12 @@ function NotFoundScreen() {
     if (router.canGoBack()) {
       router.back();
     } else {
-      const hasTabsIndex = expoSitemap?.children?.some(
-        (child) =>
-          child.contextKey === './(tabs)/_layout.jsx' &&
-          child.children.some((child) => child.contextKey === './(tabs)/index.jsx')
+      const hasTabsGroup = expoSitemap?.children?.some(
+        (child) => child.contextKey === './(tabs)/_layout.jsx'
       );
       if (isExpoSitemap) {
-        if (hasTabsIndex) {
-          router.replace('../(tabs)/index.jsx');
+        if (hasTabsGroup) {
+          router.replace('../(tabs)/home');
         } else {
           router.replace('../');
         }
@@ -437,3 +435,4 @@ export default () => {
     </ErrorBoundaryWrapper>
   );
 };
+
