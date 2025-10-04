@@ -8,7 +8,7 @@ export default function LogoutScreen() {
   const { setAuth } = useAuth();
   useEffect(() => {
     setAuth(null);
-    router.replace('/login');
+    router.replace('/(auth)/login');
   }, [router, setAuth]);
   return (
     <View style={{ flex:1, alignItems:'center', justifyContent:'center' }}>

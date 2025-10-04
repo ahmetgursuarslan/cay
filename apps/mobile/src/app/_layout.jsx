@@ -1,11 +1,9 @@
 
 import { useAuth } from '@/utils/auth/useAuth';
-import { Stack } from 'expo-router';
-import { useEffect } from 'react';
+import { Stack, useRouter, useSegments } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
 import { View, ActivityIndicator } from 'react-native';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useFonts, Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 
@@ -21,57 +19,69 @@ const queryClient = new QueryClient({
 });
 
 export default function RootLayout() {
-  const { initiate, isReady } = useAuth();
+  const router = useRouter();
+  const segments = useSegments();
+  const { initiate, isReady, isAuthenticated, auth } = useAuth();
   const [fontsLoaded] = useFonts({
     Inter_400Regular,
     Inter_500Medium,
     Inter_600SemiBold,
     Inter_700Bold,
   });
+  const [fontsReady, setFontsReady] = useState(false);
+  useEffect(() => {
+    let t = setTimeout(() => setFontsReady(true), 1500);
+    if (fontsLoaded) {
+      setFontsReady(true);
+      clearTimeout(t);
+    }
+    return () => clearTimeout(t);
+  }, [fontsLoaded]);
 
   useEffect(() => {
     initiate();
   }, [initiate]);
 
-  // Ensure splash screen is hidden as early as possible
+  // Hide splash only when root providers are truly ready
   useEffect(() => {
-    SplashScreen.hideAsync().catch(() => {});
-  }, []);
+    if (fontsReady && isReady) {
+      SplashScreen.hideAsync().catch(() => {});
+    }
+  }, [fontsReady, isReady]);
+
+  // Centralized auth-aware routing
+  useEffect(() => {
+    if (!isReady) return;
+    const inAuthGroup = segments?.[0] === '(auth)';
+
+    if (!isAuthenticated) {
+      if (!inAuthGroup) router.replace('/(auth)/login');
+      return;
+    }
+    // authenticated
+    const verified = !!auth?.verified;
+    if (!verified) {
+      if (!(inAuthGroup && segments?.[1] === 'verify-profile')) {
+        router.replace('/(auth)/verify-profile');
+      }
+      return;
+    }
+    // verified users shouldn't stay in auth group
+    if (inAuthGroup) {
+      router.replace('/(tabs)/home');
+    }
+  }, [isReady, isAuthenticated, auth?.verified, segments, router]);
 
   return (
     <QueryClientProvider client={queryClient}>
-      <SafeAreaProvider>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <Stack screenOptions={{ headerShown: false }} initialRouteName="index">
-          <Stack.Screen name="index" />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="person-detail" options={{ headerShown: false }} />
-          <Stack.Screen name="review-detail" options={{ headerShown: false }} />
-          <Stack.Screen name="add-review" options={{ headerShown: false }} />
-          <Stack.Screen name="report" options={{ headerShown: false }} />
-          <Stack.Screen name="settings" options={{ headerShown: false }} />
-          <Stack.Screen name="privacy-settings" options={{ headerShown: false }} />
-          <Stack.Screen name="security-settings" options={{ headerShown: false }} />
-          <Stack.Screen name="terms" options={{ headerShown: false }} />
-          <Stack.Screen name="privacy-policy" options={{ headerShown: false }} />
-          <Stack.Screen name="login" options={{ headerShown: false }} />
-          <Stack.Screen name="signup" options={{ headerShown: false }} />
-          <Stack.Screen name="logout" options={{ headerShown: false }} />
-          <Stack.Screen name="verify-profile" options={{ headerShown: false }} />
-          <Stack.Screen name="photo-check" options={{ headerShown: false }} />
-          <Stack.Screen name="criminal-check" options={{ headerShown: false }} />
-          <Stack.Screen name="edit-profile" options={{ headerShown: false }} />
-          <Stack.Screen name="contact-settings" options={{ headerShown: false }} />
-          <Stack.Screen name="notification-settings" options={{ headerShown: false }} />
-          <Stack.Screen name="theme-settings" options={{ headerShown: false }} />
-          <Stack.Screen name="language-settings" options={{ headerShown: false }} />
-          <Stack.Screen name="help" options={{ headerShown: false }} />
-          <Stack.Screen name="about" options={{ headerShown: false }} />
-          <Stack.Screen name="contact" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-        </Stack>
-      </GestureHandlerRootView>
-      </SafeAreaProvider>
+      {fontsReady && isReady ? (
+        <Stack screenOptions={{ headerShown: false }} />
+      ) : (
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <ActivityIndicator size="small" color="#16A34A" />
+        </View>
+      )}
     </QueryClientProvider>
   );
 }
+

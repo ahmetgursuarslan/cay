@@ -21,7 +21,7 @@ export default function VerifyProfile() {
           <TouchableOpacity onPress={() => router.back()} style={{ width:40, height:40, borderRadius:20, alignItems:'center', justifyContent:'center', backgroundColor: colors.background }}>
             <ArrowLeft size={20} color={colors.primary} />
           </TouchableOpacity>
-          <Text style={{ color: colors.primary, fontSize: 18, fontWeight:'600' }}>Profil Doğrulama</Text>
+          <Text style={{ color: colors.primary, fontSize: 18, fontWeight:'600' }}>Profil DoÄŸrulama</Text>
           <View style={{ width:40 }} />
         </View>
       </View>
@@ -30,18 +30,18 @@ export default function VerifyProfile() {
           <View style={{ alignItems:'center', marginBottom: 12 }}>
             <CheckCircle size={40} color={colors.accent} />
           </View>
-          <Text style={{ color: colors.primary, fontSize: 16, textAlign:'center', marginBottom: 8 }}>Güvenli deneyim için hesabınızı doğrulayın</Text>
+          <Text style={{ color: colors.primary, fontSize: 16, textAlign:'center', marginBottom: 8 }}>GÃ¼venli deneyim iÃ§in hesabÄ±nÄ±zÄ± doÄŸrulayÄ±n</Text>
           <Text style={{ color: colors.secondary, textAlign:'center', marginBottom: 16 }}>
-            Fotoğraf doğrulama ve temel bilgiler ile topluluk güvenliğini artırıyoruz.
+            FotoÄŸraf doÄŸrulama ve temel bilgiler ile topluluk gÃ¼venliÄŸini artÄ±rÄ±yoruz.
           </Text>
           <TouchableOpacity onPress={() => router.push('/photo-check')} style={{ backgroundColor: colors.accentLight, paddingVertical: 12, borderRadius: 10, marginBottom: 10, alignItems:'center' }}>
             <View style={{ flexDirection:'row', alignItems:'center' }}>
               <Camera size={18} color={colors.accent} />
-              <Text style={{ color: colors.accent, fontWeight:'600', marginLeft: 8 }}>Fotoğraf Doğrulama</Text>
+              <Text style={{ color: colors.accent, fontWeight:'600', marginLeft: 8 }}>FotoÄŸraf DoÄŸrulama</Text>
             </View>
           </TouchableOpacity>
           <TouchableOpacity onPress={onVerify} style={{ backgroundColor: colors.accent, paddingVertical: 12, borderRadius: 10 }}>
-            <Text style={{ color:'#fff', textAlign:'center', fontWeight:'600' }}>Şimdilik Doğrula</Text>
+            <Text style={{ color:'#fff', textAlign:'center', fontWeight:'600' }}>Åimdilik DoÄŸrula</Text>
           </TouchableOpacity>
         </View>
       </View>

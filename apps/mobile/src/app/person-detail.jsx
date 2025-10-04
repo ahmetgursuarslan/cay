@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   View,
   Text,
   ScrollView,
   TouchableOpacity,
+  Share,
   useColorScheme,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
@@ -50,9 +51,7 @@ export default function PersonDetailScreen() {
     Inter_700Bold,
   });
 
-  if (!fontsLoaded) {
-    return null;
-  }
+  // Render using system fonts if web fonts haven't loaded yet
 
   const colors = {
     primary: isDark ? "#FFFFFF" : "#000000",
@@ -70,13 +69,13 @@ export default function PersonDetailScreen() {
     yellow: "#F59E0B",
   };
 
-  // Mock data - gerçek uygulamada API'den gelecek
+  // Mock data - gerÃ§ek uygulamada API'den gelecek
   const personData = {
-    name: params.name || "Ahmet Yılmaz",
+    name: params.name || "Ahmet YÄ±lmaz",
     phone: params.phone || "+90 555 123 45 67",
     email: "ahmet@example.com",
     instagram: "@ahmet_istanbul",
-    location: "İstanbul, Türkiye",
+    location: "Ä°stanbul, TÃ¼rkiye",
     joinDate: "Ocak 2024",
     riskLevel: "low", // low, medium, high
     rating: 4.5,
@@ -84,7 +83,7 @@ export default function PersonDetailScreen() {
     positiveReviews: 20,
     negativeReviews: 4,
     verifiedInfo: true,
-    lastSeen: "2 gün önce",
+    lastSeen: "2 gÃ¼n Ã¶nce",
   };
 
   const getRiskColor = (level) => {
@@ -103,11 +102,11 @@ export default function PersonDetailScreen() {
   const getRiskText = (level) => {
     switch (level) {
       case "low":
-        return "Düşük Risk";
+        return "DÃ¼ÅŸÃ¼k Risk";
       case "medium":
         return "Orta Risk";
       case "high":
-        return "Yüksek Risk";
+        return "YÃ¼ksek Risk";
       default:
         return "Bilinmiyor";
     }
@@ -125,6 +124,17 @@ export default function PersonDetailScreen() {
         return colors.border;
     }
   };
+
+  const handleShare = useCallback(() => {
+    const ratingInfo = personData.rating ? `${personData.rating}/5` : 'Degerlendirme yok';
+    const message = `${personData.name} profilini incele. Guvenlik puani: ${ratingInfo}.`;
+    if (Share?.share) {
+      Share.share({
+        title: personData.name,
+        message,
+      }).catch(() => {});
+    }
+  }, [personData.name, personData.rating]);
 
   const InfoItem = ({ icon: IconComponent, label, value, iconColor }) => (
     <View
@@ -223,7 +233,7 @@ export default function PersonDetailScreen() {
         borderWidth: variant === "default" ? 1 : 0,
         borderColor: colors.border,
       }}
-      onPress={onPress}
+      onPress={() => router.back()}
       activeOpacity={0.8}
     >
       <IconComponent
@@ -318,10 +328,10 @@ export default function PersonDetailScreen() {
               color: colors.primary,
             }}
           >
-            Profil Detayı
+            Profil DetayÄ±
           </Text>
           <TouchableOpacity
-            onPress={() => setIsSaved(!isSaved)}
+            onPress={() => router.back()}
             style={{
               width: 40,
               height: 40,
@@ -422,7 +432,7 @@ export default function PersonDetailScreen() {
                   marginTop: 4,
                 }}
               >
-                {personData.reviewCount} değerlendirme
+                {personData.reviewCount} deÄŸerlendirme
               </Text>
             </View>
 
@@ -448,7 +458,7 @@ export default function PersonDetailScreen() {
               />
               <StatCard
                 icon={Calendar}
-                label="Son Görülme"
+                label="Son GÃ¶rÃ¼lme"
                 value={personData.lastSeen}
                 color={colors.secondary}
               />
@@ -466,7 +476,7 @@ export default function PersonDetailScreen() {
               marginBottom: 16,
             }}
           >
-            İletişim Bilgileri
+            Ä°letiÅŸim Bilgileri
           </Text>
           <View
             style={{
@@ -533,7 +543,7 @@ export default function PersonDetailScreen() {
                     marginBottom: 4,
                   }}
                 >
-                  Kayıt Tarihi
+                  KayÄ±t Tarihi
                 </Text>
                 <Text
                   style={{
@@ -564,7 +574,7 @@ export default function PersonDetailScreen() {
                       color: colors.accent,
                     }}
                   >
-                    Doğrulandı
+                    DoÄŸrulandÄ±
                   </Text>
                 </View>
               )}
@@ -592,7 +602,7 @@ export default function PersonDetailScreen() {
               Son Yorumlar
             </Text>
             <TouchableOpacity
-              onPress={() => router.push("/(tabs)/reviews")}
+              onPress={() => router.back()}
               activeOpacity={0.7}
             >
               <Text
@@ -602,7 +612,7 @@ export default function PersonDetailScreen() {
                   color: colors.accent,
                 }}
               >
-                Tümünü Gör
+                TÃ¼mÃ¼nÃ¼ GÃ¶r
               </Text>
             </TouchableOpacity>
           </View>
@@ -617,7 +627,7 @@ export default function PersonDetailScreen() {
               shadowRadius: 8,
               elevation: 2,
             }}
-            onPress={() => router.push("/review-detail")}
+            onPress={() => router.back()}
             activeOpacity={0.9}
           >
             <View
@@ -635,7 +645,7 @@ export default function PersonDetailScreen() {
                   color: colors.secondary,
                 }}
               >
-                2 gün önce
+                2 gÃ¼n Ã¶nce
               </Text>
             </View>
             <Text
@@ -646,8 +656,8 @@ export default function PersonDetailScreen() {
                 lineHeight: 20,
               }}
             >
-              Çok güvenilir ve dürüst bir kişi. Buluşmamız çok güzel geçti,
-              kendimi güvende hissettim.
+              Ã‡ok gÃ¼venilir ve dÃ¼rÃ¼st bir kiÅŸi. BuluÅŸmamÄ±z Ã§ok gÃ¼zel geÃ§ti,
+              kendimi gÃ¼vende hissettim.
             </Text>
           </TouchableOpacity>
         </View>
@@ -701,8 +711,8 @@ export default function PersonDetailScreen() {
                     }}
                   >
                     {personData.riskLevel === "high"
-                      ? "Bu profil hakkında olumsuz yorumlar bulunmaktadır. Lütfen dikkatli olun ve buluşmalarda güvenlik önlemlerinizi alın."
-                      : "Bu profil hakkında bazı uyarılar bulunmaktadır. Lütfen buluşmalarda dikkatli olun."}
+                      ? "Bu profil hakkÄ±nda olumsuz yorumlar bulunmaktadÄ±r. LÃ¼tfen dikkatli olun ve buluÅŸmalarda gÃ¼venlik Ã¶nlemlerinizi alÄ±n."
+                      : "Bu profil hakkÄ±nda bazÄ± uyarÄ±lar bulunmaktadÄ±r. LÃ¼tfen buluÅŸmalarda dikkatli olun."}
                   </Text>
                 </View>
               </View>
@@ -713,6 +723,7 @@ export default function PersonDetailScreen() {
 
       {/* Bottom Actions */}
       <View
+        pointerEvents="box-none"
         style={{
           position: "absolute",
           bottom: 0,
@@ -734,18 +745,18 @@ export default function PersonDetailScreen() {
         <View style={{ flexDirection: "row", marginHorizontal: -6 }}>
           <ActionButton
             icon={Flag}
-            label="Şikayet Et"
-            onPress={() => router.push("/report")}
+            label="Åikayet Et"
+            onPress={() => router.back()}
           />
           <ActionButton
             icon={Share2}
-            label="Paylaş"
-            onPress={() => {}}
+            label="PaylaÅŸ"
+            onPress={() => router.back()}
           />
           <ActionButton
             icon={ExternalLink}
-            label="Yorum Yaz"
-            onPress={() => router.push("/add-review")}
+            label=""
+            onPress={() => router.back()}
             variant="primary"
           />
         </View>
@@ -753,3 +764,4 @@ export default function PersonDetailScreen() {
     </View>
   );
 }
+

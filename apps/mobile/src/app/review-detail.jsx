@@ -31,7 +31,7 @@ import {
   Inter_600SemiBold,
   Inter_700Bold,
 } from "@expo-google-fonts/inter";
-import KeyboardAvoidingAnimatedView from "@/components/KeyboardAvoidingAnimatedView";
+// Use plain layout to avoid keyboard/animation deadlocks
 
 export default function ReviewDetailScreen() {
   const insets = useSafeAreaInsets();
@@ -50,9 +50,7 @@ export default function ReviewDetailScreen() {
     Inter_700Bold,
   });
 
-  if (!fontsLoaded) {
-    return null;
-  }
+  // Render using system fonts if web fonts haven't loaded yet
 
   const colors = {
     primary: isDark ? "#FFFFFF" : "#000000",
@@ -71,14 +69,14 @@ export default function ReviewDetailScreen() {
   // Mock data
   const reviewData = {
     id: params.id || "1",
-    authorName: "Ayşe K.",
-    targetName: "Mehmet Yılmaz",
+    authorName: "AyÅŸe K.",
+    targetName: "Mehmet YÄ±lmaz",
     rating: 5,
-    date: "15 Aralık 2024",
-    location: "İstanbul",
-    meetingType: "Kahve Buluşması",
+    date: "15 AralÄ±k 2024",
+    location: "Ä°stanbul",
+    meetingType: "Kahve BuluÅŸmasÄ±",
     status: "safe",
-    text: "Mehmet ile tanıştığımda kendimi çok güvende hissettim. Söyledikleri ile yaptıkları birebir örtüştü. Çok nazik ve saygılı bir insan. Herkese öneririm. Güvenli bir buluşma oldu.",
+    text: "Mehmet ile tanÄ±ÅŸtÄ±ÄŸÄ±mda kendimi Ã§ok gÃ¼vende hissettim. SÃ¶yledikleri ile yaptÄ±klarÄ± birebir Ã¶rtÃ¼ÅŸtÃ¼. Ã‡ok nazik ve saygÄ±lÄ± bir insan. Herkese Ã¶neririm. GÃ¼venli bir buluÅŸma oldu.",
     helpfulCount: 24,
     notHelpfulCount: 2,
     isVerified: true,
@@ -86,14 +84,14 @@ export default function ReviewDetailScreen() {
       {
         id: 1,
         author: "Zeynep M.",
-        text: "Ben de benzer bir deneyim yaşadım, kesinlikle güvenilir.",
-        date: "16 Aralık 2024",
+        text: "Ben de benzer bir deneyim yaÅŸadÄ±m, kesinlikle gÃ¼venilir.",
+        date: "16 AralÄ±k 2024",
       },
       {
         id: 2,
         author: "Can Y.",
-        text: "Teşekkürler bilgi için.",
-        date: "17 Aralık 2024",
+        text: "TeÅŸekkÃ¼rler bilgi iÃ§in.",
+        date: "17 AralÄ±k 2024",
       },
     ],
   };
@@ -114,7 +112,7 @@ export default function ReviewDetailScreen() {
   const getStatusText = (status) => {
     switch (status) {
       case "safe":
-        return "Güvenli";
+        return "GÃ¼venli";
       case "warning":
         return "Dikkatli Ol";
       case "danger":
@@ -199,8 +197,7 @@ export default function ReviewDetailScreen() {
   );
 
   return (
-    <KeyboardAvoidingAnimatedView style={{ flex: 1 }} behavior="padding">
-      <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
         <StatusBar style={isDark ? "light" : "dark"} />
 
         {/* Header */}
@@ -247,7 +244,7 @@ export default function ReviewDetailScreen() {
                 color: colors.primary,
               }}
             >
-              Yorum Detayı
+              Yorum DetayÄ±
             </Text>
             <TouchableOpacity
               onPress={() => {}}
@@ -334,7 +331,7 @@ export default function ReviewDetailScreen() {
                         color: colors.accent,
                       }}
                     >
-                      Doğrulandı
+                      DoÄŸrulandÄ±
                     </Text>
                   </View>
                 )}
@@ -363,7 +360,7 @@ export default function ReviewDetailScreen() {
                     marginBottom: 4,
                   }}
                 >
-                  Hakkında
+                  HakkÄ±nda
                 </Text>
                 <View
                   style={{
@@ -509,7 +506,7 @@ export default function ReviewDetailScreen() {
                     color: colors.secondary,
                   }}
                 >
-                  Bu yorum faydalı mı?
+                  Bu yorum faydalÄ± mÄ±?
                 </Text>
                 <View style={{ flexDirection: "row", gap: 12 }}>
                   <TouchableOpacity
@@ -593,6 +590,7 @@ export default function ReviewDetailScreen() {
 
         {/* Bottom Input */}
         <View
+          pointerEvents="box-none"
           style={{
             position: "absolute",
             bottom: 0,
@@ -654,7 +652,7 @@ export default function ReviewDetailScreen() {
             </TouchableOpacity>
           </View>
           <TouchableOpacity
-            onPress={() => router.push("/report")}
+            onPress={() => router.push("/add-review")}
             style={{
               flexDirection: "row",
               alignItems: "center",
@@ -671,11 +669,10 @@ export default function ReviewDetailScreen() {
                 color: colors.danger,
               }}
             >
-              Bu yorumu şikayet et
+              Bu yorumu ÅŸikayet et
             </Text>
           </TouchableOpacity>
         </View>
-      </View>
-    </KeyboardAvoidingAnimatedView>
+    </View>
   );
 }

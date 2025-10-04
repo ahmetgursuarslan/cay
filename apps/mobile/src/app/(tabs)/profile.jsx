@@ -51,9 +51,7 @@ export default function ProfileScreen() {
     Inter_700Bold,
   });
 
-  if (!fontsLoaded) {
-    return null;
-  }
+  // Render using system fonts if web fonts haven't loaded yet
 
   const colors = makeColors(isDark);
 
@@ -412,33 +410,6 @@ export default function ProfileScreen() {
           </Text>
 
           <SettingsOption
-            icon={Settings}
-            title="Ayarlar"
-            description="Uygulama ayarlarını yönet"
-            onPress={() => router.push("/settings")}
-            iconColor={colors.accent}
-            iconBackground={colors.accentLight}
-          />
-
-          <SettingsOption
-            icon={User}
-            title="Kişisel Bilgiler"
-            description="Ad, soyad ve profil bilgileri"
-            onPress={() => router.push("/edit-profile")}
-            iconColor={colors.blue}
-            iconBackground={`${colors.blue}20`}
-          />
-
-          <SettingsOption
-            icon={Mail}
-            title="E-posta ve İletişim"
-            description="İletişim bilgilerinizi güncelleyin"
-            onPress={() => router.push("/contact-settings")}
-            iconColor={colors.accent}
-            iconBackground={colors.accentLight}
-          />
-
-          <SettingsOption
             icon={Lock}
             title="Gizlilik ve Güvenlik"
             description="Hesap güvenlik ayarları"
@@ -486,18 +457,7 @@ export default function ProfileScreen() {
             onPress={() => router.push("/language-settings")}
             iconColor={colors.blue}
             iconBackground={`${colors.blue}20`}
-          />
-
-          <SettingsOption
-            icon={HelpCircle}
-            title="Yardım ve Destek"
-            description="SSS ve destek merkezi"
-            onPress={() => router.push("/help")}
-            iconColor={colors.accent}
-            iconBackground={colors.accentLight}
-          />
-
-          <SettingsOption
+          /><SettingsOption
             icon={Info}
             title="Uygulama Hakkında"
             description="Versiyon bilgisi ve şartlar"
@@ -524,7 +484,7 @@ export default function ProfileScreen() {
             icon={LogOut}
             title="Çıkış Yap"
             description="Hesabınızdan güvenli şekilde çıkış yapın"
-            onPress={() => router.push("/logout")}
+            onPress={() => router.push("/(auth)/logout")}
             iconColor={colors.danger}
             iconBackground={`${colors.danger}20`}
           />
