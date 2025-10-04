@@ -45,9 +45,7 @@ export default function SafetyScreen() {
     Inter_700Bold,
   });
 
-  if (!fontsLoaded) {
-    return null;
-  }
+  // Render using system fonts if web fonts haven't loaded yet
 
   const colors = {
     primary: isDark ? "#FFFFFF" : "#000000",

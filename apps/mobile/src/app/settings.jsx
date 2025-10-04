@@ -59,9 +59,7 @@ export default function SettingsScreen() {
     Inter_700Bold,
   });
 
-  if (!fontsLoaded) {
-    return null;
-  }
+  // Render using system fonts if web fonts haven't loaded yet
 
   const colors = {
     primary: isDark ? "#FFFFFF" : "#000000",
@@ -371,15 +369,7 @@ export default function SettingsScreen() {
         </SettingsSection>
 
         {/* About & Support */}
-        <SettingsSection title="Hakkında ve Destek">
-          <SettingsItem
-            icon={HelpCircle}
-            title="Yardım ve SSS"
-            onPress={() => router.push("/help")}
-            iconColor={colors.accent}
-            iconBackground={colors.accentLight}
-          />
-          <SettingsItem
+        <SettingsSection title="Hakkında ve Destek"><SettingsItem
             icon={Info}
             title="Hakkında"
             onPress={() => router.push("/about")}
@@ -399,15 +389,7 @@ export default function SettingsScreen() {
             onPress={() => router.push("/privacy-policy")}
             iconColor={colors.accent}
             iconBackground={colors.accentLight}
-          />
-          <SettingsItem
-            icon={Mail}
-            title="İletişim"
-            onPress={() => router.push("/contact")}
-            iconColor={colors.accent}
-            iconBackground={colors.accentLight}
-          />
-        </SettingsSection>
+          /></SettingsSection>
 
         {/* Account */}
         <View style={{ paddingHorizontal: 24, marginBottom: 24 }}>
@@ -423,7 +405,7 @@ export default function SettingsScreen() {
               borderColor: colors.danger,
             }}
             activeOpacity={0.8}
-            onPress={() => router.push('/logout')}
+            onPress={() => router.push('/(auth)/logout')}
           >
             <LogOut size={20} color={colors.danger} style={{ marginRight: 8 }} />
             <Text

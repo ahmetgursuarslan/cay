@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   View,
   Text,
@@ -20,6 +20,7 @@ import {
   Coffee,
 } from "lucide-react-native";
 import { useRouter } from "expo-router";
+import { useAuth } from "@/utils/auth/useAuth";
 // Fonts are loaded at the root layout; avoid per-screen gating
 
 const { width: screenWidth } = Dimensions.get("window");
@@ -27,9 +28,30 @@ const { width: screenWidth } = Dimensions.get("window");
 export default function Home() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const { auth } = useAuth();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
   const [showHeaderBorder, setShowHeaderBorder] = useState(false);
+
+  const handleNotificationsPress = useCallback(() => {
+    router.push("/notification-settings");
+  }, [router]);
+
+  const handleCtaPress = useCallback(() => {
+    router.push("/(auth)/signup");
+  }, [router]);
+
+  const handleVerifyPress = useCallback(() => {
+    try {
+    if (auth?.verified) {
+      router.push("/(tabs)/profile");
+      } else {
+        router.push("/(auth)/verify-profile");
+      }
+    } catch (_) {
+      router.push("/(auth)/verify-profile");
+    }
+  }, [auth?.verified, router]);
 
   // Do not block render on fonts here; root layout handles fonts
 
@@ -216,6 +238,10 @@ export default function Home() {
               alignItems: "center",
               justifyContent: "center",
             }}
+            onPress={handleNotificationsPress}
+            accessibilityRole="button"
+            accessibilityLabel="Bildirim ayarlarına git"
+            activeOpacity={0.8}
           >
             <Bell size={20} color={colors.accent} />
           </TouchableOpacity>
@@ -267,7 +293,7 @@ export default function Home() {
             <QuickActionButton
               icon={Search}
               title="Hızlı Araştırma"
-              onPress={() => router.push("/(tabs)/search")}
+              onPress={() => router.push("/(tabs)/home")}
               variant="primary"
             />
             <QuickActionButton
@@ -278,7 +304,7 @@ export default function Home() {
             <QuickActionButton
               icon={UserCheck}
               title="Profil Doğrulama"
-              onPress={() => router.push("/verify-profile")}
+              onPress={handleVerifyPress}
             />
           </View>
         </View>
@@ -302,7 +328,7 @@ export default function Home() {
             description="Tanıştığın kişinin adını, telefon numarasını veya sosyal medya profilini araştır ve güvenli olup olmadığını öğren."
             color={colors.accent}
             backgroundColor={colors.card}
-            onPress={() => router.push("/(tabs)/search")}
+            onPress={() => router.push("/(tabs)/home")}
           />
 
           <SafetyFeatureCard
@@ -320,7 +346,7 @@ export default function Home() {
             description="Kişinin gerçek kimliğini doğrula ve sahte profillere karşı kendini koru."
             color="#3B82F6"
             backgroundColor={colors.card}
-            onPress={() => router.push("/verify-profile")}
+            onPress={handleVerifyPress}
           />
 
           <SafetyFeatureCard
@@ -384,6 +410,9 @@ export default function Home() {
                 borderRadius: 24,
               }}
               activeOpacity={0.9}
+              onPress={handleCtaPress}
+              accessibilityRole="button"
+              accessibilityLabel="Hemen Başla"
             >
               <Text
                 style={{
@@ -401,3 +430,6 @@ export default function Home() {
     </View>
   );
 }
+
+
+

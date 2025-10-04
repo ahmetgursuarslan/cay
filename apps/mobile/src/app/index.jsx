@@ -13,10 +13,11 @@ export default function Index() {
     );
   }
   if (!isAuthenticated) {
-    return <Redirect href="/login" />;
+    return <Redirect href="/(auth)/login" />;
   }
   if (!auth?.verified) {
-    return <Redirect href="/verify-profile" />;
+    return <Redirect href="/(auth)/verify-profile" />;
   }
   return <Redirect href="/(tabs)/home" />;
 }
+

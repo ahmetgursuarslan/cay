@@ -28,7 +28,6 @@ import {
   Inter_600SemiBold,
   Inter_700Bold,
 } from "@expo-google-fonts/inter";
-import KeyboardAvoidingAnimatedView from "@/components/KeyboardAvoidingAnimatedView";
 
 export default function ReportScreen() {
   const insets = useSafeAreaInsets();
@@ -50,9 +49,7 @@ export default function ReportScreen() {
     Inter_700Bold,
   });
 
-  if (!fontsLoaded) {
-    return null;
-  }
+  // Render using system fonts if web fonts haven't loaded yet
 
   const colors = {
     primary: isDark ? "#FFFFFF" : "#000000",
@@ -127,8 +124,7 @@ export default function ReportScreen() {
   );
 
   return (
-    <KeyboardAvoidingAnimatedView style={{ flex: 1 }} behavior="padding">
-      <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
         <StatusBar style={isDark ? "light" : "dark"} />
 
         {/* Header */}
@@ -607,6 +603,7 @@ export default function ReportScreen() {
 
         {/* Bottom Submit Button */}
         <View
+          pointerEvents="box-none"
           style={{
             position: "absolute",
             bottom: 0,
@@ -651,6 +648,6 @@ export default function ReportScreen() {
           </TouchableOpacity>
         </View>
       </View>
-    </KeyboardAvoidingAnimatedView>
+    
   );
 }

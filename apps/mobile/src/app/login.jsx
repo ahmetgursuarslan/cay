@@ -25,7 +25,7 @@ export default function LoginScreen() {
   const onLogin = () => {
     // Demo: set a minimal auth object without verified
     setAuth({ jwt: 'demo', email, verified: false });
-    router.replace('/verify-profile');
+    router.replace('/(auth)/verify-profile');
   };
 
   return (
@@ -37,7 +37,7 @@ export default function LoginScreen() {
       <TouchableOpacity onPress={onLogin} style={{ backgroundColor: colors.accent, padding: 14, borderRadius: 12, alignItems: 'center' }}>
         <Text style={{ color: 'white', fontSize: 16 }}>Giriş</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => router.push('/signup')} style={{ padding: 14, alignItems: 'center', marginTop: 8 }}>
+      <TouchableOpacity onPress={() => router.push('/(auth)/signup')} style={{ padding: 14, alignItems: 'center', marginTop: 8 }}>
         <Text style={{ color: colors.secondary, fontSize: 14 }}>Hesabın yok mu? Kayıt Ol</Text>
       </TouchableOpacity>
     </View>
