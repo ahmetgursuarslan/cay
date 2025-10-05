@@ -23,10 +23,13 @@ export interface HierarchicalLayoutOptions {
   srcRoots?: string[];
 }
 
-const DEFAULT_PAGE_PATTERN = /\/page\.(jsx?)$/;
-const DEFAULT_LAYOUT_FILES = ['layout.jsx'];
+// Support both TSX and JSX pages
+const DEFAULT_PAGE_PATTERN = /\/page\.(t|j)sx$/;
+// Support TSX and JSX layouts
+const DEFAULT_LAYOUT_FILES = ['layout.jsx', 'layout.tsx'];
 const DEFAULT_PARAM_PATTERN = /\[(\.{3})?([^\]]+)\]/g;
-const NO_LAYOUT_QUERY = '?noLayout.jsx';
+// Keep original extension; avoid forcing .jsx so TSX stays TSX for tooling
+const NO_LAYOUT_QUERY = '?noLayout';
 
 export function layoutWrapperPlugin(userOpts: HierarchicalLayoutOptions = {}): Plugin {
   const opts: Required<HierarchicalLayoutOptions> = {
@@ -138,7 +141,7 @@ export function layoutWrapperPlugin(userOpts: HierarchicalLayoutOptions = {}): P
 
     if (routeParams.length > 0) {
       imports.push(
-        `import { useParams${hasSpreadParams ? ', useLocation' : ''} } from 'react-router-dom';`
+        `import { useParams${hasSpreadParams ? ', useLocation' : ''} } from 'react-router';`
       );
     }
 

@@ -1,68 +1,73 @@
-# Create Anything – Monorepo (Web + Expo Mobile)
+# Çay — Monorepo (Web + Expo Mobile)
 
-Bu depo, iki uygulamadan oluşan bir monorepoyu barındırır:
+Çay, güvenli flört için pratik araçlar sunan bir uygulamadır. Mobil deneyimi temel alan benzer bir arayüzle web sürümü de mevcuttur.
 
-- `apps/web`: React Router + Vite tabanlı web uygulaması (Bun ile geliştirme önerilir)
+- `apps/web`: React Router + Vite tabanlı web uygulaması (Tailwind, lucide ikonlar)
 - `apps/mobile`: Expo (React Native) mobil uygulaması (Android/iOS/Web)
 
-Aşağıda yerel geliştirme, ortam değişkenleri, scriptler ve GitHub’a paylaşım (CI dâhil) için gerekli tüm ayarlar ve talimatlar yer alır.
+Özellikler (TR):
+- Hızlı arama: İsim, numara veya sosyal profillerle temel araştırma
+- Ters görsel arama: Profil fotoğraflarının kaynağını kontrol etme
+- Kimlik doğrulama: Kişilerin gerçekliğini doğrulama akışları
+- Suç kaydı kontrolü: Güvenli buluşma için risk göstergeleri
+- Güvenlik ipuçları: Daha güvenli çevrim içi flört rehberi
 
-## Geliştirme Önkoşulları
+Features (EN):
+- Quick lookup: Search by name, phone, or social profiles
+- Reverse image: Check if profile photos are authentic
+- Identity verification flows
+- Criminal record indicators for safety-minded dating
+- Safety tips for online dating
 
+## Türkçe
+
+### Geliştirme Gereksinimleri
 - Node.js 20+
-- Bun (web için tavsiye edilir): https://bun.sh
-- Android/iOS geliştirmesi için gerekli SDK ve araçlar (Expo dokümantasyonuna bakın)
+- Bun (web için önerilir): https://bun.sh
+- Android/iOS geliştirme araçları (Expo dokümantasyonu)
 
-## Kurulum
-
-- Web (Bun ile):
+### Kurulum ve Çalıştırma
+- Web (Bun):
   - Dizin: `apps/web`
   - Bağımlılıklar: `bun install`
   - Geliştirme: `bun run dev`
-
-- Mobile (npm ile):
-  - Dizin: `apps/mobile`
+- Mobil (npm):
+  - Dizin: `apps/mobile
   - Bağımlılıklar: `npm install`
   - Başlat: `npm run start`
   - Android: `npm run android`
-  - iOS (macOS’ta): `npm run ios`
+  - iOS (macOS): `npm run ios`
 
-## Ortam Değişkenleri
+### Ortam Değişkenleri
+- Web: `apps/web/.env` (örnek: `apps/web/.env.example` varsa onu temel alın)
+- Mobil: `apps/mobile/.env` (örnek: `apps/mobile/.env.example`)
 
-- Web için `.env` dosyasını `apps/web/.env` yoluna koyun. Örnek için `apps/web/.env.example` dosyasına bakın.
-- Mobile için `.env` gerekiyorsa `apps/mobile/.env` oluşturun (şablon eklenmiştir: `apps/mobile/.env.example`). Expo Config Plugins veya `expo-constants` ile kullanabilirsiniz.
+### CI
+- GitHub Actions (`.github/workflows/ci.yml`) ile web ve mobil için tip kontrol ve test doğrulamaları çalışır.
 
-## Scriptler
+## English
 
-- Web:
-  - `dev`: Geliştirme sunucusu
-  - `typecheck`: Tip kontrolü ve route typegen
-  - `test`: Vitest testleri çalıştırma (CI zaten çalıştırır)
+### Requirements
+- Node.js 20+
+- Bun for web (recommended): https://bun.sh
+- Android/iOS tooling (see Expo docs)
 
-- Mobile:
-  - `start`: Expo başlat
-  - `web`: Expo web
-  - `android`: Android derleme/çalıştırma
-  - `ios`: iOS derleme/çalıştırma
+### Setup & Run
+- Web (Bun):
+  - Dir: `apps/web`
+  - Install: `bun install`
+  - Dev: `bun run dev`
+- Mobile (npm):
+  - Dir: `apps/mobile`
+  - Install: `npm install`
+  - Start: `npm run start`
+  - Android: `npm run android`
+  - iOS (macOS): `npm run ios`
 
-## CI (GitHub Actions)
+### Environment
+- Web: `apps/web/.env`
+- Mobile: `apps/mobile/.env`
 
-- `.github/workflows/ci.yml` ile hem web hem mobile için tip kontrolü ve test/patche doğrulaması yapılır.
-- Web job’ı Bun ile çalışır ve `typecheck` + `vitest` koşar.
-- Mobile job’ı Node 20 ile `tsc --noEmit` ve `patch-package --check` çalıştırır.
+### License
+MIT (see `LICENSE`).
 
-## Paylaşım (GitHub’a gönderim)
-
-1. Bu klasörde bir Git deposu başlatın (eğer yoksa) ve uzak repoyu ekleyin.
-2. Değişiklikleri commit’leyip `main` dalına push’layın. CI otomatik tetiklenecektir.
-
-## Lisans
-
-MIT Lisansı (bkz. `LICENSE`).
-
-*** Notlar
-- Web tarafında `bun.lock` mevcut; CI da Bun kullanır. İsterseniz Node/NPM’e geçmek için scriptleri ve CI’ı uyarlayabilirsiniz.
-- Expo için EAS veya store yayın süreçleri bu depoya dâhil değildir; ihtiyaç halinde ayrı bir CI/CD pipeline eklenebilir.
- - Patch uyarıları: `apps/mobile/patches` içindeki patch’ler, bağımlılıklar minör/patche güncellendiğinde “version mismatch” uyarısı verebilir. Patch’ler doğru uygulanıyorsa sorun yoktur. Uyarıyı kaldırmak için:
-   - İlgili paketi güncel sürüme karşı tekrar patch’leyin: `cd apps/mobile; npx patch-package <paket-adi>`
-   - Alternatif: Patch dosya adını yeni sürüme göre yeniden adlandırın (içerik aynı kalır).
