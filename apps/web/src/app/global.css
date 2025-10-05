@@ -3,6 +3,18 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    color-scheme: light dark;
+  }
+  html, body, #root {
+    height: 100%;
+  }
+  body {
+    @apply bg-gray-50 text-gray-900 dark:bg-neutral-900 dark:text-neutral-100 antialiased;
+  }
+  a {
+    @apply text-emerald-700 hover:text-emerald-800 dark:text-emerald-400 dark:hover:text-emerald-300;
+  }
   input, textarea, select, button {
     @apply outline-none focus:outline-none;
   }
