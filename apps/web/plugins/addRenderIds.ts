@@ -158,7 +158,10 @@ export function addRenderIds(): PluginOption {
         sourceMaps: true,
         babelrc: false,
         configFile: false,
-        presets: [['@babel/preset-react', { runtime: 'automatic' }], '@babel/preset-typescript'],
+        presets: [
+          ['@babel/preset-react', { runtime: 'automatic' }],
+          ['@babel/preset-typescript', { isTSX: true, allExtensions: true }],
+        ],
         plugins: [getRenderIdVisitor({ filename: id })],
       });
 

@@ -1,30 +1,33 @@
-## Create mobile app
+## Çay Mobil — Expo (React Native)
 
-React Native + Expo app (web support via Metro). This repo is cleaned up and ready for GitHub.
+TR: Çay, güvenli flört için araçlar sunar: hızlı arama, ters görsel arama, kimlik doğrulama, suç kaydı göstergeleri ve güvenlik ipuçları. Uygulama Android/iOS/Web (Expo) hedeflerini destekler.
 
-### Requirements
+EN: Çay provides tools for safer dating: quick lookup, reverse image search, identity verification, criminal record indicators, and safety tips. Targets Android/iOS/Web via Expo.
+
+### Gereksinimler / Requirements
 - Node.js LTS
-- pnpm or npm
-- Expo CLI (optional for local dev)
+- npm veya pnpm
+- (Opsiyonel) Expo CLI yerel geliştirme için
 
-### Install
+### Kurulum / Install
 ```
 npm install
 ```
 
-### Run (web)
+### Çalıştırma / Run
+- Web:
 ```
 npm run web
 ```
-
-### Run (native)
+- Native:
 ```
 npm start
 ```
 
 ### Build
-EAS configs are included (`eas.json`). Build with EAS or local build tools.
+EAS yapılandırmaları `eas.json` ile gelir. EAS veya yerel araçlarla derleyebilirsiniz.
 
-### Notes
-- Patches in `patches/` are applied automatically after install via `patch-package`.
-- Large build caches and OS/editor files are ignored via `.gitignore`.
+### Notlar / Notes
+- `patches/` altındaki yamalar `patch-package` ile kurulum sonrası otomatik uygulanır.
+- Büyük önbellekler ve OS/IDE dosyaları `.gitignore` ile hariç tutulur.
+

@@ -25,7 +25,8 @@ import './global.css';
 
 import fetch from '@/__create/fetch';
 // @ts-ignore
-import { SessionProvider } from '@auth/create/react';
+// Removed SessionProvider to avoid client fetch during SSR/hydration
+// import { SessionProvider } from '@auth/create/react';
 import { useNavigate } from 'react-router';
 import { serializeError } from 'serialize-error';
 import { Toaster } from 'sonner';
@@ -208,35 +209,21 @@ function LoaderWrapper({ loader }: { loader: () => React.ReactNode }) {
   return <>{loader()}</>;
 }
 
-type ClientOnlyProps = {
-  loader: () => React.ReactNode;
-};
+type ClientOnlyProps = { loader: () => React.ReactNode };
+// Render the same output on server and during initial client hydration
+// to avoid hydration mismatches. Use ClientMount to gate truly client-only UI.
+export const ClientOnly: React.FC<ClientOnlyProps> = ({ loader }) => (
+  <ErrorBoundaryWrapper>
+    <LoaderWrapper loader={loader} />
+  </ErrorBoundaryWrapper>
+);
 
-export const ClientOnly: React.FC<ClientOnlyProps> = ({ loader }) => {
-  const [isMounted, setIsMounted] = useState(false);
-  const isSSR = typeof window === 'undefined';
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  // During SSR, render immediately to avoid blank initial HTML.
-  if (isSSR) {
-    return (
-      <ErrorBoundaryWrapper>
-        <LoaderWrapper loader={loader} />
-      </ErrorBoundaryWrapper>
-    );
-  }
-
-  if (!isMounted) return null;
-
-  return (
-    <ErrorBoundaryWrapper>
-      <LoaderWrapper loader={loader} />
-    </ErrorBoundaryWrapper>
-  );
-};
+function ClientMount({ children }: { children: React.ReactNode }) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
+  return <>{children}</>;
+}
 
 /**
  * useHmrConnection()
@@ -385,6 +372,7 @@ export function Layout({ children }: { children: ReactNode }) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="color-scheme" content="light dark" />
         <Meta />
         <Links />
         <script type="module" src="/src/__create/dev-error-overlay.js"></script>
@@ -394,7 +382,9 @@ export function Layout({ children }: { children: ReactNode }) {
       <body>
         <ClientOnly loader={() => children} />
         <HotReloadIndicator />
-        <Toaster position="bottom-right" />
+        <ClientMount>
+          <Toaster position="bottom-right" />
+        </ClientMount>
         <ScrollRestoration />
         {/* Ensure scripts render even in SSR path */}
         <Scripts />
@@ -405,9 +395,5 @@ export function Layout({ children }: { children: ReactNode }) {
 }
 
 export default function App() {
-  return (
-    <SessionProvider>
-      <Outlet />
-    </SessionProvider>
-  );
+  return <Outlet />;
 }
